@@ -1,0 +1,7 @@
+
+%%
+
+%%
+void initMe(void) {
+    return;
+}
