@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "hash.h"
@@ -19,7 +20,7 @@ int hash_code(char *text) {
 void hash_init(){
 	int i;
 
-	for(i=0; i<HASH_SIZE; i++){
+	for(i=0; i < HASH_SIZE; i++){
 		table[i] = NULL;
 	}
 }
@@ -27,56 +28,62 @@ void hash_init(){
 HASH_NODE* hash_insert(int token, char *text) {
     int code = hash_code(text);
     HASH_NODE* base, *new;
+    int textlen = strlen(text);
 
-    if(hash_search(text) != NULL)
-	return	new;			//erro caso já exista, retorna o ponteiro para o nó
+    if (hash_search(text) != NULL) {
+	    return new;			//erro caso já exista, retorna o ponteiro para o nó
+    }
 
     base = table[code];
 
     new = (HASH_NODE*) calloc(1, sizeof(HASH_NODE));
-    strcpy(new->text,text);
-    new->token = NULL;			//não sei o que vai aqui
+    new->text = (char*) calloc(textlen, sizeof(char));
+    strcpy(new->text, text);
+    new->token = token;
 
-    if(base!=NULL){
-	new->next = base;
-	base = new;
-    }else{
-	new->next = NULL;
-	base = new;
-    }
+    new->next = base;
+    base = new;
+    table[code] = base;
 
-    return NULL;
+    return table[code];
 }
 HASH_NODE* hash_search(char *text) {
 
-    int code = hash_code(text), cont = 1;
+    int code = hash_code(text);
+    int cont = 1;
     HASH_NODE* current;
 
     current = table[code];
 
-    while(cont){
-	if(current == NULL)
-		cont = 0;
-	else
-		if(!strcmp(text,current->text))
-			return current;
-	    	else
-		    current = current->next;
+    while (cont) {
+        if (current == NULL) {
+            cont = 0;
+        } else {
+            if (!strcmp(text,current->text)) {
+                return current;
+            } else {
+                current = current->next;
+            }
+        }
     }
     return NULL;
 }
-
-void hash_print(){
+void node_print(HASH_NODE *node) {
+    printf("token: %d - text: %s// -> ", node->token, node->text);
+}
+void hash_print(void) {
 	int i;
 	HASH_NODE *current;
 
-	for(i=0; i<HASH_SIZE; i++){
+	for (i = 0; i < HASH_SIZE; i++) {
 		current = table[i];
-		while(current!= NULL){
-			printf("token: %d - text: %s//", current->token, current->text);
-			current = current->next;
-		}
-	printf("\n");
+        if (current != NULL) {
+            printf("%d", i);
+            while (current != NULL) {
+                node_print(current);
+            }
+            printf("NULL\n");
+        }
 	}
 }
 

@@ -45,7 +45,18 @@ int getLineNumber(void);
 [,;:()\[\]{}+\-*/<>=!&$#] {
     return yytext[0];
 }
-\"([^\"\n]|"\\\"")*\" { return LIT_STRING; }
+\"([^\"\n]|"\\\"")*\" {
+    char *text;
+    int textlen = strlen(yytext) - 1;
+    printf("String: %s. :3\n", yytext);
+    text = (char*) malloc(textlen * sizeof(char));
+    strncpy(text,&yytext[1],textlen);
+    text[textlen - 1] = 0x0;
+    hash_insert(LIT_STRING, text);
+    printf("String: %s. :3\n", text);
+    free(text);
+    return LIT_STRING;
+}
 [a-zA-Z_][a-zA-Z_0-9]* {
     return TK_IDENTIFIER;
 }
@@ -53,7 +64,10 @@ int getLineNumber(void);
 [0-9]+ { return LIT_INTEGER; }
 [0-9]+\.[0-9]+ { return LIT_REAL; }
 
-('[^\n\r']'|'\\[\\'nrt]') { return LIT_CHAR; }
+('[^\n\r']'|'\\[\\'nrt]') {
+    hash_insert(LIT_CHAR, yytext);
+    return LIT_CHAR;
+}
 
 [^ \t\n\r]+ { return TOKEN_ERROR; }
 
@@ -69,6 +83,7 @@ int yywrap(void) {
     if (!feof(yyin)) {
         running = 1;
     } else {
+        hash_print();
         running = 0;
     }
     return 1;
@@ -77,5 +92,6 @@ int yywrap(void) {
 void initMe(void) {
     running = 1;
     lineNumber = 1;
+    hash_init();
     return;
 }

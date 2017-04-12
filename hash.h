@@ -1,5 +1,4 @@
 #define HASH_SIZE 997
-#define HASH_TEXT_LEN 64
 
 typedef struct hash_node {
     char *text;
@@ -8,6 +7,7 @@ typedef struct hash_node {
 } HASH_NODE;
 
 HASH_NODE *table[HASH_SIZE];
-void hash_init();
+void hash_init(void);
 HASH_NODE* hash_insert(int token, char *text);
 HASH_NODE* hash_search(char *text);
+void hash_print(void);
