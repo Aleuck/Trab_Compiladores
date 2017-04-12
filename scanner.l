@@ -7,7 +7,13 @@ int lineNumber = 1;
 int getLineNumber(void);
 %}
 
+%x COMMENTARY_BLOCK
+
 %%
+
+"/*"    BEGIN(COMMENTARY_BLOCK);
+<COMMENTARY_BLOCK>"*/" BEGIN(INITIAL);
+<COMMENTARY_BLOCK>. {  }
 
 "byte"      { return KW_BYTE; }
 "short"     { return KW_SHORT; }
@@ -36,10 +42,17 @@ int getLineNumber(void);
 [,;:()\[\]{}+\-*/<>=!&$#] {
     return yytext[0];
 }
-
+\"([^\"\n]|"\\\"")*\" { return LIT_STRING; }
 [a-zA-Z_][a-zA-Z_0-9]* {
     return TK_IDENTIFIER;
 }
+
+[0-9]+ { return LIT_INTEGER; }
+[0-9]+\.[0-9]+ { return LIT_REAL; }
+
+('[^\n\r']'|'\\[\\'nrt]') { return LIT_CHAR; }
+"'\\''" { return LIT_CHAR; }
+[^ \t\n\r]+ { return TOKEN_ERROR; }
 
 \n          { ++lineNumber; }
 
