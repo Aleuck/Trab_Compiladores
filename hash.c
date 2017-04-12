@@ -1,14 +1,14 @@
-#include "hash.h"
 #include <string.h>
+#include "hash.h"
 
 int hash_code(char *text);
 
 int hash_code(char *text) {
-    int strlen = strlen(text);
+    int textlen = strlen(text);
     int hash = 1;
     int i;
 
-    for (i=0; i<strlen; ++i) {
+    for (i=0; i<textlen; ++i) {
         hash = text[i] * hash;
         hash = hash % HASH_SIZE + 1;
     }
