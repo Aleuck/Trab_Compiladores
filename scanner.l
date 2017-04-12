@@ -11,9 +11,12 @@ int getLineNumber(void);
 
 %%
 
-"/*"    BEGIN(COMMENTARY_BLOCK);
-<COMMENTARY_BLOCK>"*/" BEGIN(INITIAL);
-<COMMENTARY_BLOCK>. {  }
+"/*".*    			BEGIN(COMMENTARY_BLOCK);
+<COMMENTARY_BLOCK>.*"*/" 	BEGIN(INITIAL);
+<COMMENTARY_BLOCK>\n		{lineNumber++;}	
+<COMMENTARY_BLOCK>. 		{  }
+
+"//".*	    { }
 
 "byte"      { return KW_BYTE; }
 "short"     { return KW_SHORT; }
@@ -51,7 +54,7 @@ int getLineNumber(void);
 [0-9]+\.[0-9]+ { return LIT_REAL; }
 
 ('[^\n\r']'|'\\[\\'nrt]') { return LIT_CHAR; }
-"'\\''" { return LIT_CHAR; }
+
 [^ \t\n\r]+ { return TOKEN_ERROR; }
 
 \n          { ++lineNumber; }
@@ -72,5 +75,7 @@ int yywrap(void) {
 }
 
 void initMe(void) {
+    running = 1;
+    lineNumber = 1;
     return;
 }
