@@ -15,6 +15,41 @@ void strshift(char* str){
 		}
 		str[i-1] = '\0';
 }
+
+void strtst(char* text){
+	char *substr;	
+
+	substr = strstr(text, "\\n");
+	if(substr){
+		substr[0] = '\n';
+		strshift(substr);
+	}
+	substr = strstr(text, "\\t");
+	if(substr){
+		substr[0] = '\t';
+		strshift(substr);
+	}
+	substr = strstr(text, "\\r");
+	if(substr){
+		substr[0] = '\r';
+		strshift(substr);
+	}
+	substr = strstr(text, "\\\"");
+	if(substr){
+		substr[0] = '\"';
+		strshift(substr);
+	}
+	substr = strstr(text, "\\\'");
+	if(substr){
+		substr[0] = '\'';
+		strshift(substr);
+	}
+	substr = strstr(text, "\\");
+	if(substr){
+		substr[0] = '\\';
+		strshift(substr);
+	}
+}
 %}
 
 %x COMMENTARY_BLOCK
@@ -55,37 +90,13 @@ void strshift(char* str){
 [,;:()\[\]{}+\-*/<>=!&$#] {
     return yytext[0];
 }
-\"([^\"\n\\]|\\[\"\\nrt])*\" {
-    char *text, *substr;
+\"([^\"\n\\]|\\[\"\'\\nrt])*\" {
+    char *text;
     int textlen = strlen(yytext) - 1;
     text = (char*) calloc(textlen, sizeof(char));
     strncpy(text,&yytext[1],textlen);
     text[textlen - 1] = 0x0;
-	substr = strstr(text, "\\n");
-	if(substr){
-		substr[0] = '\n';
-		strshift(substr);
-	}
-	substr = strstr(text, "\\t");
-	if(substr){
-		substr[0] = '\t';
-		strshift(substr);
-	}
-	substr = strstr(text, "\\r");
-	if(substr){
-		substr[0] = '\r';
-		strshift(substr);
-	}
-	substr = strstr(text, "\\\"");
-	if(substr){
-		substr[0] = '\"';
-		strshift(substr);
-	}
-	substr = strstr(text, "\\");
-	if(substr){
-		substr[0] = '\\';
-		strshift(substr);
-	}
+	strtst(text);
 
     hash_insert(LIT_STRING, text);
     free(text);
@@ -123,12 +134,13 @@ void strshift(char* str){
     return LIT_REAL;
 }
 
-'([^\n\r']|\\[\'nrt0])' {
+'([^\n\r']|\\[\\\'\"nrt0])' {
     char *text;
     int textlen = strlen(yytext) - 1;
     text = (char*) calloc(textlen, sizeof(char));
     strncpy(text,&yytext[1],textlen);
     text[textlen - 1] = 0x0;
+	strtst(text);
     hash_insert(LIT_CHAR, text);
     free(text);
     return LIT_CHAR;
@@ -151,7 +163,7 @@ int yywrap(void) {
     } else {
         running = 0;
     }
-
+//    hash_print();
     return 1;
 }
 
