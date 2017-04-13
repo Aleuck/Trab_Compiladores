@@ -18,22 +18,22 @@ int getLineNumber(void);
 
 "//".*	    { }
 
-"byte"      { return KW_BYTE; }
-"short"     { return KW_SHORT; }
-"long"      { return KW_LONG; }
-"float"     { return KW_FLOAT; }
-"double"    { return KW_DOUBLE; }
+"byte"      { printf("Keyword: %s. :3\n", yytext); return KW_BYTE; }
+"short"     { printf("Keyword: %s. :3\n", yytext); return KW_SHORT; }
+"long"      { printf("Keyword: %s. :3\n", yytext); return KW_LONG; }
+"float"     { printf("Keyword: %s. :3\n", yytext); return KW_FLOAT; }
+"double"    { printf("Keyword: %s. :3\n", yytext); return KW_DOUBLE; }
 
-"when"      { return KW_WHEN; }
-"then"      { return KW_THEN; }
-"else"      { return KW_ELSE; }
-"while"     { return KW_WHILE; }
-"for"       { return KW_FOR; }
+"when"      { printf("Keyword: %s. :3\n", yytext); return KW_WHEN; }
+"then"      { printf("Keyword: %s. :3\n", yytext); return KW_THEN; }
+"else"      { printf("Keyword: %s. :3\n", yytext); return KW_ELSE; }
+"while"     { printf("Keyword: %s. :3\n", yytext); return KW_WHILE; }
+"for"       { printf("Keyword: %s. :3\n", yytext); return KW_FOR; }
 
-"read"      { return KW_READ; }
-"print"     { return KW_PRINT; }
+"read"      { printf("Keyword: %s. :3\n", yytext); return KW_READ; }
+"print"     { printf("Keyword: %s. :3\n", yytext); return KW_PRINT; }
 
-"return"    { return KW_RETURN; }
+"return"    { printf("Keyword: %s. :3\n", yytext); return KW_RETURN; }
 
 "<="        { return OPERATOR_LE ; }
 ">="        { return OPERATOR_GE ; }
@@ -43,13 +43,13 @@ int getLineNumber(void);
 "||"        { return OPERATOR_OR ; }
 
 [,;:()\[\]{}+\-*/<>=!&$#] {
+    printf("Special Char: %s. :3\n", yytext);
     return yytext[0];
 }
-\"([^\"\n]|"\\\"")*\" {
+\"([^\"\n\\]|"\\[\"\\nrt0]")*\" {
     char *text;
     int textlen = strlen(yytext) - 1;
-    printf("String: %s. :3\n", yytext);
-    text = (char*) malloc(textlen * sizeof(char));
+    text = (char*) calloc(textlen, sizeof(char));
     strncpy(text,&yytext[1],textlen);
     text[textlen - 1] = 0x0;
     hash_insert(LIT_STRING, text);
@@ -58,20 +58,56 @@ int getLineNumber(void);
     return LIT_STRING;
 }
 [a-zA-Z_][a-zA-Z_0-9]* {
+    char *text;
+    int textlen = strlen(yytext) + 1;
+    text = (char*) calloc(textlen, sizeof(char));
+    strncpy(text, yytext, textlen);
+    text[textlen - 1] = 0x0;
+    hash_insert(TK_IDENTIFIER, text);
+    printf("Identifier: %s. :3\n", text);
+    free(text);
     return TK_IDENTIFIER;
 }
 
-[0-9]+ { return LIT_INTEGER; }
-[0-9]+\.[0-9]+ { return LIT_REAL; }
+[0-9]+ {
+    char *text;
+    int textlen = strlen(yytext) + 1;
+    text = (char*) calloc(textlen, sizeof(char));
+    strncpy(text, yytext, textlen);
+    text[textlen - 1] = 0x0;
+    hash_insert(LIT_INTEGER, text);
+    printf("Integer: %s. :3\n", text);
+    free(text);
+    return LIT_INTEGER;
+}
+[0-9]+\.[0-9]+ {
+    char *text;
+    int textlen = strlen(yytext) + 1;
+    text = (char*) calloc(textlen, sizeof(char));
+    strncpy(text, yytext, textlen);
+    text[textlen - 1] = 0x0;
+    hash_insert(LIT_REAL, text);
+    printf("Real: %s. :3\n", text);
+    free(text);
+    return LIT_REAL;
+}
 
-('[^\n\r']'|'\\[\\'nrt]') {
-    hash_insert(LIT_CHAR, yytext);
+'([^\n\r']|\\[\'nrt0])' {
+    char *text;
+    int textlen = strlen(yytext) - 1;
+    text = (char*) calloc(textlen, sizeof(char));
+    strncpy(text,&yytext[1],textlen);
+    text[textlen - 1] = 0x0;
+    hash_insert(LIT_CHAR, text);
+    printf("Char: %s. :3\n", text);
+    free(text);
     return LIT_CHAR;
 }
 
-[^ \t\n\r]+ { return TOKEN_ERROR; }
+[^ \t\n\r,;:()\[\]{}+\-*/<>=!&$#]+ { printf("Error. :c\n"); return TOKEN_ERROR; }
+[ \t]+ ;
 
-\n          { ++lineNumber; }
+\n  { ++lineNumber; }
 
 %%
 
