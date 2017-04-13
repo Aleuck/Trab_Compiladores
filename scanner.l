@@ -5,6 +5,16 @@
 int running = 1;
 int lineNumber = 1;
 int getLineNumber(void);
+
+void strshift(char* str){
+		int i=2;
+		
+		while(str[i] != '\0'){
+			str[i-1] = str[i];
+			i++;
+		}
+		str[i-1] = '\0';
+}
 %}
 
 %x COMMENTARY_BLOCK
@@ -45,12 +55,38 @@ int getLineNumber(void);
 [,;:()\[\]{}+\-*/<>=!&$#] {
     return yytext[0];
 }
-\"([^\"\n\\]|"\\[\"\\nrt0]")*\" {
-    char *text;
+\"([^\"\n\\]|\\[\"\\nrt])*\" {
+    char *text, *substr;
     int textlen = strlen(yytext) - 1;
     text = (char*) calloc(textlen, sizeof(char));
     strncpy(text,&yytext[1],textlen);
     text[textlen - 1] = 0x0;
+	substr = strstr(text, "\\n");
+	if(substr){
+		substr[0] = '\n';
+		strshift(substr);
+	}
+	substr = strstr(text, "\\t");
+	if(substr){
+		substr[0] = '\t';
+		strshift(substr);
+	}
+	substr = strstr(text, "\\r");
+	if(substr){
+		substr[0] = '\r';
+		strshift(substr);
+	}
+	substr = strstr(text, "\\\"");
+	if(substr){
+		substr[0] = '\"';
+		strshift(substr);
+	}
+	substr = strstr(text, "\\");
+	if(substr){
+		substr[0] = '\\';
+		strshift(substr);
+	}
+
     hash_insert(LIT_STRING, text);
     free(text);
     return LIT_STRING;
@@ -115,6 +151,7 @@ int yywrap(void) {
     } else {
         running = 0;
     }
+
     return 1;
 }
 
