@@ -98,10 +98,11 @@ int isRunning(void);
     return LIT_CHAR;
 }
 
-[^ \t\n\r,;:()\[\]{}+\-*/<>=!&$#]+ { return TOKEN_ERROR; }
 [ \t]+ ;
 
 \n  { ++lineNumber; }
+
+. { return TOKEN_ERROR; }
 
 %%
 
