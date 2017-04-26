@@ -51,25 +51,29 @@ extern FILE *yyin;
 program:    cmd_list
             ;
 
-cmd_list:   cmd_list cmd ';' //not sure about recursion
+cmd_list:    cmd ';' cmd_list  //not sure about recursion
             |cmd ';'
+            |
             ;
 
 cmd:        block
-			|var_decl
+            |var_decl
+            |vector_decl
             |function_decl
-            |TK_IDENTIFIER '=' exp
+            |TK_IDENTIFIER '=' exp        //atribuição de variável
+            |TK_IDENTIFIER '#' exp '=' exp  //atribuição de variável
             |flow_ctrl
             |function_call
             |KW_READ TK_IDENTIFIER
-            |KW_PRINT print_cmd_list
+            |KW_PRINT string_concat
             |KW_RETURN exp
             |
             ;
 
 var_decl:   TK_IDENTIFIER ':' type initial_value
-            |TK_IDENTIFIER ':' type '[' LIT_INTEGER ']'
-            |TK_IDENTIFIER ':' type '[' LIT_INTEGER ']' initial_values
+            ;
+
+vector_decl: TK_IDENTIFIER ':' type '[' LIT_INTEGER ']' initial_values
             ;
 
 type:       KW_BYTE
@@ -78,11 +82,13 @@ type:       KW_BYTE
             |KW_LONG
             |KW_SHORT
             ;
- 
-initial_values: initial_values initial_value        //não leva em consideração o tamanho do vetor
+
+initial_values: initial_value initial_values
+                |initial_value       //não leva em consideração o tamanho do vetor
+                |
                 ;
- 
-initial_value: '\'' LIT_CHAR '\''
+
+initial_value:  LIT_CHAR
                 |LIT_INTEGER
                 |LIT_REAL
                 ;
@@ -93,35 +99,35 @@ function_decl:  type TK_IDENTIFIER '(' decl_paramlistv ')' cmd
 decl_paramlistv:    decl_paramlist
                     |
                     ;
-                
+
 decl_paramlist: type TK_IDENTIFIER ',' decl_paramlist
                 |type TK_IDENTIFIER;
-                
+
 
 block:      '{' cmd_list '}'
             ;
- 
+
 flow_ctrl:  whenthen
             |whenthenelse
             |while
             |for
             ;
 
-whenthen:   KW_WHEN '(' bool_exp ')' KW_THEN cmd
+whenthen:   KW_WHEN '(' exp ')' KW_THEN cmd
             ;
 
-whenthenelse:   KW_WHEN '(' bool_exp ')' KW_THEN cmd KW_ELSE cmd
+whenthenelse:   KW_WHEN '(' exp ')' KW_THEN cmd KW_ELSE cmd
                 ;
- 
-while:      KW_WHILE '(' bool_exp ')' cmd
+
+while:      KW_WHILE '(' exp ')' cmd
             ;
 
-for:        KW_FOR '(' TK_IDENTIFIER '=' arit_exp KW_TO arit_exp ')' cmd            //token KW_TO was missing or shouldnt exist?
+for:        KW_FOR '(' TK_IDENTIFIER '=' exp KW_TO exp ')' cmd            //token KW_TO was missing or shouldnt exist?
             ;
 
 function_call:  TK_IDENTIFIER '(' paramlist ')'
                 ;
-                
+
 paramlist:  param ',' paramlist
             |param
             ;
@@ -132,59 +138,42 @@ param:      exp
             |
             ;
 
-print_cmd_list: print_cmd_list print_cmd
-                |print_cmd
+string_concat: simple_string string_concat
+                |simple_string
                 ;
 
-print_cmd:  LIT_STRING
+simple_string:  LIT_STRING
             |TK_IDENTIFIER
             ;
 
-exp:        arit_exp
-            |bool_exp
-            ;
-
-arit_exp:   '(' arit_exp ')'
-            |arit_exp '+' arit_exp
-            |arit_exp '-' arit_exp
-            |arit_exp '*' arit_exp
-            |arit_exp '/' arit_exp
+exp:        '(' exp ')'
+            |'!' exp
+            |exp '+' exp
+            |exp '-' exp
+            |exp '*' exp
+            |exp '/' exp
+            |exp '>' exp
+            |exp '<' exp
+            |exp OPERATOR_EQ exp
+            |exp OPERATOR_NE exp
+            |exp OPERATOR_GE exp
+            |exp OPERATOR_LE exp
             |TK_IDENTIFIER
-            |vector
+            |TK_IDENTIFIER '[' exp ']'
             |LIT_INTEGER
             |LIT_REAL
-            |'\'' LIT_CHAR '\''         //"Expressões	 também	 podem	 ser	 formadas	 considerando	 literais	 do	 tipo caractere." 
+            |LIT_CHAR          //"Expressões	 também	 podem	 ser	 formadas	 considerando	 literais	 do	 tipo caractere."
+            |function_call
+            |exp OPERATOR_AND exp
+            |exp OPERATOR_OR exp
+            |exp OPERATOR_EQ exp
+            |exp OPERATOR_NE exp
             ;
- 
-vector:     TK_IDENTIFIER '[' int_exp ']'
 
-int_exp:    '(' int_exp ')'
-            |int_exp '+' int_exp
-            |int_exp '-' int_exp
-            |int_exp '*' int_exp
-            |int_exp '/' int_exp
-            |TK_IDENTIFIER      //SEMANTICS: only int variables
-            |vector
-            |LIT_INTEGER
-            ;
- 
-bool_exp:   arit_exp OPERATOR_EQ arit_exp
-            |arit_exp OPERATOR_NE arit_exp
-            |arit_exp OPERATOR_GE arit_exp
-            |arit_exp OPERATOR_LE arit_exp
-            |arit_exp '>' arit_exp
-            |arit_exp '<' arit_exp
-            |'(' bool_exp ')'
-            |'!' bool_exp
-            |bool_exp OPERATOR_AND bool_exp
-            |bool_exp OPERATOR_OR bool_exp
-            |bool_exp OPERATOR_EQ bool_exp
-            |bool_exp OPERATOR_NE bool_exp
 %%
 
 void yyerror(char *s) {
-	printf("Parse error. %s Line Number: %d\n", s, getLineNumber());
+	printf("Parse error. \nLine Number: %d - %s\n", getLineNumber(), s);
 
-	printf("FIM");
 	exit(3);
 }

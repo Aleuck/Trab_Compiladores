@@ -36,3 +36,7 @@
 *.tgz
 
 *.sh
+
+# Swap files
+*~
+*.swp

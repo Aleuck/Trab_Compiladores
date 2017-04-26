@@ -16,7 +16,7 @@ y.tab.c: grammar.yacc
 lex.yy.o: lex.yy.c
 	gcc -c lex.yy.c
 lex.yy.c: scanner.l y.tab.h
-	flex --header-file=lex.yy.h scanner.l 
+	flex --header-file=lex.yy.h scanner.l
 y.tab.h: grammar.yacc
 	yacc -d grammar.yacc
 main.o: main.c
@@ -25,3 +25,6 @@ hash.o: hash.c
 	gcc -c hash.c
 clean:
 	rm *.o lex.yy.c lex.yy.h y.tab.h y.tab.c etapa2
+love:
+	make clean
+	make
