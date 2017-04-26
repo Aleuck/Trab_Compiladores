@@ -7,15 +7,21 @@
 # Therefore, there must be a header of it to be included in scanner.l
 #
 
-etapa1: lex.yy.o main.o hash.o
-	gcc -o etapa1 lex.yy.o main.o hash.o
+etapa2: y.tab.o lex.yy.o main.o hash.o
+	gcc -o etapa2 y.tab.o lex.yy.o main.o hash.o
+y.tab.o: y.tab.c
+	gcc -c y.tab.c
+y.tab.c: grammar.yacc
+	yacc -d grammar.yacc
+lex.yy.o: lex.yy.c
+	gcc -c lex.yy.c
+lex.yy.c: scanner.l y.tab.h
+	flex --header-file=lex.yy.h scanner.l 
+y.tab.h: grammar.yacc
+	yacc -d grammar.yacc
 main.o: main.c
 	gcc -c main.c
 hash.o: hash.c
 	gcc -c hash.c
-lex.yy.o: lex.yy.c
-	gcc -c lex.yy.c
-lex.yy.c: scanner.l
-	flex --header-file=lex.yy.h scanner.l 
 clean:
-	rm *.o lex.yy.c etapa1 lex.yy.h
+	rm *.o lex.yy.c lex.yy.h y.tab.h y.tab.c etapa2.exe

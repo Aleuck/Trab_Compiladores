@@ -1,5 +1,5 @@
 %{
-#include "tokens.h"
+#include "y.tab.h"
 #include "hash.h"
 
 int running = 1;
@@ -29,6 +29,7 @@ int isRunning(void);
 "else"      { return KW_ELSE; }
 "while"     { return KW_WHILE; }
 "for"       { return KW_FOR; }
+"to"		{ return KW_TO; }
 
 "read"      { return KW_READ; }
 "print"     { return KW_PRINT; }

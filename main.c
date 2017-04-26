@@ -2,12 +2,13 @@
 #include "lex.yy.h"
 #include <stdio.h>
 
-extern int getLineNumber(void);
+extern int yyparse();
 extern int isRunning(void);
 
 int main(int argc, char *argv[]) {
-    int token;
-    if (argc < 2) {
+    int token, result = 1;
+    
+	if (argc < 2) {
         printf("Por favor especifique o nome do arquivo de entrada.\n");
         exit(1);
     }
@@ -16,9 +17,9 @@ int main(int argc, char *argv[]) {
     if (!yyin) {
         printf("Não foi possível abrir o arquivo.\n");
     }
-    while (isRunning()) {
-        token = yylex();
-        printf("(%d):\t%d\n", getLineNumber(), token);
-    }
-    return 0;
+    
+	while(isRunning())	//not sure about this line
+		yyparse();
+	
+	exit(0);	//EOF and no error
 }
