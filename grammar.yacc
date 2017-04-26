@@ -185,5 +185,6 @@ bool_exp:   arit_exp OPERATOR_EQ arit_exp
 void yyerror(char *s) {
 	printf("Parse error. %s Line Number: %d\n", s, getLineNumber());
 
+	printf("FIM");
 	exit(3);
 }
