@@ -183,7 +183,7 @@ bool_exp:   arit_exp OPERATOR_EQ arit_exp
 %%
 
 void yyerror(char *s) {
-	printf("Parse error. %s Line Number: %d", s, getLineNumber());
+	printf("Parse error. %s Line Number: %d\n", s, getLineNumber());
 
 	exit(3);
 }
