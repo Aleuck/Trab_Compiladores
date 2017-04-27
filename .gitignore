@@ -40,3 +40,15 @@
 # Swap files
 *~
 *.swp
+
+# Lex files
+lex.yy.c
+lex.yy.h
+
+# Yacc files
+y.tab.c
+y.tab.h
+
+# Bin
+etapa1
+etapa2
