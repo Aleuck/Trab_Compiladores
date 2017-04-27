@@ -171,6 +171,7 @@ exp:        '(' exp ')'
             |function_call
             |exp OPERATOR_AND exp
             |exp OPERATOR_OR exp
+            |'-' exp
             ;
 
 %%
