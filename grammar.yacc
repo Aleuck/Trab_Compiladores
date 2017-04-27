@@ -43,11 +43,11 @@ extern FILE *yyin;
 %token TOKEN_ERROR
 
 //precedências:
-%left '-' '+'
-%left '*' '/'
 %left OPERATOR_OR OPERATOR_AND
 %left '>' '<' OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_NE
-%left '!'
+%left '-' '+'
+%left '*' '/'
+%left '!' LONE_MINUS
 %right KW_THEN KW_ELSE
 
 %%
@@ -171,7 +171,7 @@ exp:        '(' exp ')'
             |function_call
             |exp OPERATOR_AND exp
             |exp OPERATOR_OR exp
-            |'-' exp
+            |'-' exp %prec LONE_MINUS
             ;
 
 %%
