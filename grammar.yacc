@@ -51,9 +51,9 @@ extern FILE *yyin;
 program:    cmd_list
             ;
 
-cmd_list:    cmd ';' cmd_list  //not sure about recursion
+cmd_list:   cmd ';' cmd_list  //not sure about recursion
             |cmd ';'
-            |
+            |%empty
             ;
 
 cmd:        block
@@ -67,7 +67,7 @@ cmd:        block
             |KW_READ TK_IDENTIFIER
             |KW_PRINT string_concat
             |KW_RETURN exp
-            |
+            |%empty
             ;
 
 var_decl:   TK_IDENTIFIER ':' type initial_value
@@ -85,7 +85,7 @@ type:       KW_BYTE
 
 initial_values: initial_value initial_values
                 |initial_value       //não leva em consideração o tamanho do vetor
-                |
+                |%empty
                 ;
 
 initial_value:  LIT_CHAR
@@ -97,11 +97,12 @@ function_decl:  type TK_IDENTIFIER '(' decl_paramlistv ')' cmd
                 ;
 
 decl_paramlistv:    decl_paramlist
-                    |
+                    |%empty
                     ;
 
 decl_paramlist: type TK_IDENTIFIER ',' decl_paramlist
-                |type TK_IDENTIFIER;
+                |type TK_IDENTIFIER
+				;
 
 
 block:      '{' cmd_list '}'
@@ -135,7 +136,7 @@ paramlist:  param ',' paramlist
 param:      exp
             |function_call
             |LIT_STRING
-            |
+            |%empty
             ;
 
 string_concat: simple_string string_concat
@@ -166,8 +167,6 @@ exp:        '(' exp ')'
             |function_call
             |exp OPERATOR_AND exp
             |exp OPERATOR_OR exp
-            |exp OPERATOR_EQ exp
-            |exp OPERATOR_NE exp
             ;
 
 %%
