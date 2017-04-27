@@ -42,9 +42,13 @@ extern FILE *yyin;
 
 %token TOKEN_ERROR
 
-//%tinha alguma coisa aqui pra resolver ambiguidade nas exp. algo como:
-//%<nlembro> : '-' '+'
-//%<nlembro> : '/' '*'
+//precedências:
+%left '-' '+'
+%left '*' '/'
+%left OPERATOR_OR OPERATOR_AND
+%left '>' '<' OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_NE
+%left '!'
+%right KW_THEN KW_ELSE
 
 %%
 
