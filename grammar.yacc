@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void yyerror(char *s);
+void yyerror(const char *s);
 
 // stuff from lex that yacc needs to know about:
 extern int yylex();
@@ -43,24 +43,31 @@ extern FILE *yyin;
 %token TOKEN_ERROR
 
 //precedências:
-%left OPERATOR_OR OPERATOR_AND
+
+%left OPERATOR_OR
+%left OPERATOR_AND
 %left '>' '<' OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_NE
 %left '-' '+'
 %left '*' '/'
-%left '!' LONE_MINUS
+%left '!' LONE_MINUS 
 %right KW_THEN KW_ELSE
+
+%error-verbose
 
 %%
 
 program:    cmd_list
             ;
 
-cmd_list:   cmd ';' cmd_list  //not sure about recursion
-            |cmd ';'
-            |%empty
+cmd_list:   cmd_list1
+            |
             ;
 
-cmd:        block
+cmd_list1:  cmd ';' cmd_list1
+            |cmd ';'
+            ;
+            
+cmd:        block 
             |var_decl
             |vector_decl
             |function_decl
@@ -71,7 +78,7 @@ cmd:        block
             |KW_READ TK_IDENTIFIER
             |KW_PRINT string_concat
             |KW_RETURN exp
-            |%empty
+            |
             ;
 
 var_decl:   TK_IDENTIFIER ':' type initial_value
@@ -87,10 +94,13 @@ type:       KW_BYTE
             |KW_SHORT
             ;
 
-initial_values: initial_value initial_values
-                |initial_value       //não leva em consideração o tamanho do vetor
-                |%empty
+initial_values: initial_values1       //não leva em consideração o tamanho do vetor
+                |
                 ;
+                
+initial_values1: initial_value initial_values1
+                 |initial_value
+                 ;    
 
 initial_value:  LIT_CHAR
                 |LIT_INTEGER
@@ -101,12 +111,12 @@ function_decl:  type TK_IDENTIFIER '(' decl_paramlistv ')' cmd
                 ;
 
 decl_paramlistv:    decl_paramlist
-                    |%empty
+                    |
                     ;
 
 decl_paramlist: type TK_IDENTIFIER ',' decl_paramlist
                 |type TK_IDENTIFIER
-				;
+                ;
 
 
 block:      '{' cmd_list '}'
@@ -133,14 +143,17 @@ for:        KW_FOR '(' TK_IDENTIFIER '=' exp KW_TO exp ')' cmd            //toke
 function_call:  TK_IDENTIFIER '(' paramlist ')'
                 ;
 
-paramlist:  param ',' paramlist
+paramlist:  paramlist1
+            |
+            ;
+
+paramlist1: param ',' paramlist1
             |param
             ;
 
 param:      exp
             |function_call
             |LIT_STRING
-            |%empty
             ;
 
 string_concat: simple_string string_concat
@@ -167,7 +180,7 @@ exp:        '(' exp ')'
             |TK_IDENTIFIER '[' exp ']'
             |LIT_INTEGER
             |LIT_REAL
-            |LIT_CHAR          //"Expressões	 também	 podem	 ser	 formadas	 considerando	 literais	 do	 tipo caractere."
+            |LIT_CHAR          //"Expressões     também     podem     ser     formadas     considerando     literais     do     tipo caractere."
             |function_call
             |exp OPERATOR_AND exp
             |exp OPERATOR_OR exp
@@ -176,8 +189,8 @@ exp:        '(' exp ')'
 
 %%
 
-void yyerror(char *s) {
-	printf("Parse error. \nLine Number: %d - %s\n", getLineNumber(), s);
+void yyerror(const char *s) {
+    printf("Parse error. \nLine Number: %d - %s\n", getLineNumber(), s);
 
-	exit(3);
+    exit(3);
 }
