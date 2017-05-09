@@ -8,6 +8,9 @@ void yyerror(const char *s);
 extern int yylex();
 extern int getLineNumber(void);
 extern FILE *yyin;
+
+int yydebug=1;
+
 %}
 
 // define the "terminal symbol" token types
@@ -59,12 +62,8 @@ extern FILE *yyin;
 program:    cmd_list
             ;
 
-cmd_list:   cmd_list1
-            |
-            ;
-
-cmd_list1:  cmd ';' cmd_list1
-            |cmd ';'
+cmd_list:   cmd ';' cmd_list
+            |cmd
             ;
             
 cmd:        block 
@@ -152,7 +151,6 @@ paramlist1: param ',' paramlist1
             ;
 
 param:      exp
-            |function_call
             |LIT_STRING
             ;
 

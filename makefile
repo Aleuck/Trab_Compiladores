@@ -12,19 +12,19 @@ etapa2: y.tab.o lex.yy.o main.o hash.o
 y.tab.o: y.tab.c
 	gcc -c y.tab.c
 y.tab.c: grammar.yacc
-	yacc -d grammar.yacc
+	yacc --verbose -d grammar.yacc
 lex.yy.o: lex.yy.c
 	gcc -c lex.yy.c
 lex.yy.c: scanner.l y.tab.h
 	flex --header-file=lex.yy.h scanner.l
 y.tab.h: grammar.yacc
-	yacc -d grammar.yacc
+	yacc --verbose -d grammar.yacc
 main.o: main.c
 	gcc -c main.c
 hash.o: hash.c
 	gcc -c hash.c
 clean:
-	rm *.o lex.yy.c lex.yy.h y.tab.h y.tab.c etapa2
+	rm *.o lex.yy.c lex.yy.h y.tab.h y.tab.c etapa2 y.output
 love:
 	make clean
 	make
