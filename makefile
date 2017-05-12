@@ -8,7 +8,7 @@
 #
 
 etapa2: y.tab.o lex.yy.o main.o hash.o
-	gcc -o etapa2 y.tab.o lex.yy.o main.o hash.o
+	gcc -o etapa3 y.tab.o lex.yy.o main.o hash.o
 y.tab.o: y.tab.c
 	gcc -c y.tab.c
 y.tab.c: grammar.yacc
@@ -24,7 +24,7 @@ main.o: main.c
 hash.o: hash.c
 	gcc -c hash.c
 clean:
-	rm *.o lex.yy.c lex.yy.h y.tab.h y.tab.c etapa2 y.output
+	rm *.o lex.yy.c lex.yy.h y.tab.h y.tab.c etapa3 y.output
 love:
 	make clean
 	make
