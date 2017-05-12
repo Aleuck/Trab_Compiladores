@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include "ast.h"
 
 void yyerror(const char *s);
 
@@ -54,6 +55,15 @@ int yydebug=1;
 %left '*' '/'
 %left '!' LONE_MINUS 
 %right KW_THEN KW_ELSE
+
+%type <ast> program cmd_list cmd var_decl vector_decl type initial_value initial_values initial_values1 
+function_decl decl_paramlist decl_paramlistv block flow_ctrl whenthen whenthenelse while for function_call
+param paramlist paramlist1 string_concat simple_string exp
+
+%union {
+//	struct dict_item *symbol_value;
+	AST *ast_node;
+}
 
 %error-verbose
 
