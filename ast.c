@@ -1,6 +1,6 @@
 #include "ast.h"
 
-AST ast_create_node(int node_type){
+AST *ast_create_node(int node_type){
     AST *node_pointer;
     int i;
     
@@ -36,7 +36,7 @@ int ast_add_son(AST *father, AST *son){
     return 0;
 }
 
-AST ast_insert(int node_type, HASH_NODE *symbol, AST *son0, AST *son1, AST *son2, AST *son3){
+AST *ast_insert(int node_type, HASH_NODE *symbol, AST *son0, AST *son1, AST *son2, AST *son3){
     AST *newnode;
     
     newnode = ast_create_node(node_type);

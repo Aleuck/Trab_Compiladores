@@ -10,8 +10,8 @@
 #define SYMBOL_SUBT        4
 #define SYMBOL_MULT        5
 #define SYMBOL_DIV         6
-#define SYMBOL_<           7
-#define SYMBOL_>           8
+#define SYMBOL_GREATER     7
+#define SYMBOL_LESS        8
 #define SYMBOL_LE          9 
 #define SYMBOL_GE          10 
 #define SYMBOL_EQ          11 
@@ -19,7 +19,8 @@
 #define SYMBOL_AND         13 
 #define SYMBOL_OR          14
 #define SYMBOL_LONE_MINUS  15
-#define SYMBOL_IDENTIFIER  16
+#define SYMBOL_NOT         16
+#define SYMBOL_IDENTIFIER  17
 
 /*#define SYMBOL_INTEGER      
 #define SYMBOL_REAL         
@@ -43,9 +44,9 @@ typedef struct node{
     HASH_NODE *symbol;
 } AST;
 
-AST ast_create_node(int node_type);
+AST *ast_create_node(int node_type);
 int ast_add_son(AST *father, AST *son);
-AST ast_insert(int node_type, HASH_NODE *symbol, AST *son0, AST *son1, AST *son2, AST *son3);
+AST *ast_insert(int node_type, HASH_NODE *symbol, AST *son0, AST *son1, AST *son2, AST *son3);
 void ast_print(int level, AST *root);
 void ast_print_node(AST *node);
 
