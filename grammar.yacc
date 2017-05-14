@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "ast.h"
+#include "hash.h"
 
 void yyerror(const char *s);
 
@@ -13,6 +14,12 @@ extern FILE *yyin;
 int yydebug=1;
 
 %}
+
+%union {
+    HASH_NODE *terminal_symbol;
+	AST *ast_node;
+    char* elemesmo;
+}
 
 // define the "terminal symbol" token types
 
@@ -56,14 +63,10 @@ int yydebug=1;
 %left '!' LONE_MINUS 
 %right KW_THEN KW_ELSE
 
-%type <ast> program cmd_list cmd var_decl vector_decl type initial_value initial_values initial_values1 
-function_decl decl_paramlist decl_paramlistv block flow_ctrl whenthen whenthenelse while for function_call
-param paramlist paramlist1 string_concat simple_string exp
 
-%union {
-//	struct dict_item *symbol_value;
-	AST *ast_node;
-}
+%type <ast_node> exp
+%type <elemesmo> TK_IDENTIFIER LIT_INTEGER LIT_REAL LIT_CHAR function_call
+
 
 %error-verbose
 
@@ -149,7 +152,7 @@ while:      KW_WHILE '(' exp ')' cmd
 for:        KW_FOR '(' TK_IDENTIFIER '=' exp KW_TO exp ')' cmd            //token KW_TO was missing or shouldnt exist?
             ;
 
-function_call:  TK_IDENTIFIER '(' paramlist ')'
+function_call:  TK_IDENTIFIER '(' paramlist ')'     {$$ = $1;}
                 ;
 
 paramlist:  paramlist1
@@ -172,27 +175,27 @@ simple_string:  LIT_STRING
             |TK_IDENTIFIER
             ;
 
-exp:        '(' exp ')'
-            |'!' exp
-            |exp '+' exp
-            |exp '-' exp
-            |exp '*' exp
-            |exp '/' exp
-            |exp '>' exp
-            |exp '<' exp
-            |exp OPERATOR_EQ exp
-            |exp OPERATOR_NE exp
-            |exp OPERATOR_GE exp
-            |exp OPERATOR_LE exp
-            |TK_IDENTIFIER
-            |TK_IDENTIFIER '[' exp ']'
-            |LIT_INTEGER
-            |LIT_REAL
-            |LIT_CHAR          //"Expressões     também     podem     ser     formadas     considerando     literais     do     tipo caractere."
-            |function_call
-            |exp OPERATOR_AND exp
-            |exp OPERATOR_OR exp
-            |'-' exp %prec LONE_MINUS
+exp:        '(' exp ')'     {$$ = $2;}
+            |'!' exp        {$$ = ast_insert(SYMBOL_NOT, 0, $2, 0, 0, 0);}
+            |exp '+' exp    {$$ = ast_insert(SYMBOL_SUM, 0, $1, $3, 0, 0);}
+            |exp '-' exp    {$$ = ast_insert(SYMBOL_SUBT, 0, $1, $3, 0, 0);}
+            |exp '*' exp    {$$ = ast_insert(SYMBOL_MULT, 0, $1, $3, 0, 0);}
+            |exp '/' exp    {$$ = ast_insert(SYMBOL_DIV, 0, $1, $3, 0, 0);}
+            |exp '>' exp    {$$ = ast_insert(SYMBOL_GREATER, 0, $1, $3, 0, 0);}
+            |exp '<' exp    {$$ = ast_insert(SYMBOL_LESS, 0, $1, $3, 0, 0);}
+            |exp OPERATOR_EQ exp    {$$ = ast_insert(SYMBOL_EQ, 0, $1, $3, 0, 0);}
+            |exp OPERATOR_NE exp    {$$ = ast_insert(SYMBOL_NE, 0, $1, $3, 0, 0);}
+            |exp OPERATOR_GE exp    {$$ = ast_insert(SYMBOL_GE, 0, $1, $3, 0, 0);}
+            |exp OPERATOR_LE exp    {$$ = ast_insert(SYMBOL_LE, 0, $1, $3, 0, 0);}
+            |TK_IDENTIFIER          {$$ = ast_insert(SYMBOL_IDENTIFIER, hash_search($1), 0,0,0,0);}
+            |TK_IDENTIFIER '[' exp ']'  {$$ = ast_insert(SYMBOL_IDENTIFIER, hash_search($1), 0,0,0,0);}
+            |LIT_INTEGER            {$$ = ast_insert(SYMBOL_IDENTIFIER, hash_search($1), 0,0,0,0);}
+            |LIT_REAL               {$$ = ast_insert(SYMBOL_IDENTIFIER, hash_search($1), 0,0,0,0);}
+            |LIT_CHAR               {$$ = ast_insert(SYMBOL_IDENTIFIER, hash_search($1), 0,0,0,0);}
+            |function_call          {$$ = ast_insert(SYMBOL_IDENTIFIER, hash_search($1), 0,0,0,0);}
+            |exp OPERATOR_AND exp   {$$ = ast_insert(SYMBOL_AND, 0, $1, $3, 0, 0);}
+            |exp OPERATOR_OR exp    {$$ = ast_insert(SYMBOL_OR, 0, $1, $3, 0, 0);}
+            |'-' exp %prec LONE_MINUS     {$$ = ast_insert(SYMBOL_LONE_MINUS, 0, $2, 0, 0, 0);}
             ;
 
 %%
