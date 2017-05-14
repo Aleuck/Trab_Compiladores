@@ -13,31 +13,70 @@ AST ast_create_node(int node_type){
     for(i=0; i<MAX_CHILDREN; i++){
         node_pointer->son[i] = NULL;
     }
-//    node_pointer->symbol = NULL;
+    node_pointer->symbol = NULL;
     node_pointer->node_type = node_type;
     
     return node_pointer;
 }
 
-AST ast_add_son(AST *father, AST *son){
-    int i=0;
-    
-    while(i < MAX_CHILDREN && father->son[i] == NULL)
+int ast_add_son(AST *father, AST *son){
+    int i;
+
+    i=0;
+    while(i < MAX_CHILDREN && father->son[i] != NULL)
         i++;
-    
-    if(i != MAX_CHILDREN){
+
+    if(i != MAX_CHILDREN)
+    {
         father->son[i] = son;
+    }else
+    {
+        printf(stderr, "error: no space for kids in this family\n");
+        return 666;
     }
-        
+    return 0;
 }
 
-ast_print(int level, AST *root){
+AST ast_insert(int node_type, AST *symbol, AST *son0, AST *son1, AST *son2, AST *son3){
+    AST *newnode;
+    
+    newnode = ast_create_node(node_type);
+    if(!newnode){
+        printf(stderr, "error: insert - newnode\n");
+        return 0;}
+
+    newnode->symbol = symbol;
+    
+    newnode->son[0] = son0;
+    newnode->son[1] = son1;
+    newnode->son[2] = son2;
+    newnode->son[3] = son3;
+    
+    return newnode;
+}
+
+
+void ast_print(int level, AST *root){
     int i;
 
     if(root){
         for(i=0 ; i<level; i++)
             printf("    ");
+        
+        ast_print_node(root);
+        
+        for(i=0; i<MAX_CHILDREN; i++)
+        {
+            if(root->son[i])
+            {
+                ast_print(root->son[i]);
+            }
+        }
+    }
+}
+void ast_print_node(AST *node){ //incomplete
 
+    if(node){
         switch(root->node_type){
             
             case SYMBOL_BYTE    :   printf("SYMBOL_BYTE"); break;
@@ -69,8 +108,5 @@ ast_print(int level, AST *root){
         }
             
         printf("\n");
-        for(i =0; i<MAX_CHILDREN; i++)
-            if(root->son[i])
-                ast_print(level + 1, root->son[i]);
     }
 }

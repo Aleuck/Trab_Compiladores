@@ -24,7 +24,7 @@ main.o: main.c
 hash.o: hash.c
 	gcc -c hash.c
 ast.o: ast.c
-    gcc -c ast.c
+	gcc -c ast.c
 clean:
 	rm *.o lex.yy.c lex.yy.h y.tab.h y.tab.c etapa3 y.output
 love:
