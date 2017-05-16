@@ -69,22 +69,22 @@ HASH_NODE* hash_search(char *text) {
     return NULL;
 }
 void node_print(HASH_NODE *node) {
-    printf("token: %d - text: %s. -> ", node->token, node->text);
+    fprintf(stderr,"token: %d - text: %s. -> ", node->token, node->text);
 }
 void hash_print(void) {
 	int i;
 	HASH_NODE *current;
 
-    printf("\n");
+    fprintf(stderr,"\n");
 	for (i = 0; i < HASH_SIZE; i++) {
 		current = table[i];
         if (current != NULL) {
-            printf("code (%d): ", i);
+            fprintf(stderr,"code (%d): ", i);
             while (current != NULL) {
                 node_print(current);
                 current = current->next;
             }
-            printf("NULL\n");
+            fprintf(stderr,"NULL\n");
         }
 	}
 }

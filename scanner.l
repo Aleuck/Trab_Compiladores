@@ -54,7 +54,7 @@ int isRunning(void);
     text = (char*) calloc(textlen, sizeof(char));
     strncpy(text,&yytext[1],textlen);
     text[textlen - 1] = 0x0;
-    hash_insert(LIT_STRING, text);
+    yylval.terminal_symbol = hash_insert(LIT_STRING, text);
     free(text);
     return LIT_STRING;
 }
@@ -64,7 +64,7 @@ int isRunning(void);
     text = (char*) calloc(textlen, sizeof(char));
     strncpy(text, yytext, textlen);
     text[textlen - 1] = 0x0;
-    hash_insert(TK_IDENTIFIER, text);
+    yylval.terminal_symbol = hash_insert(TK_IDENTIFIER, text);
     free(text);
     return TK_IDENTIFIER;
 }
@@ -75,7 +75,7 @@ int isRunning(void);
     text = (char*) calloc(textlen, sizeof(char));
     strncpy(text, yytext, textlen);
     text[textlen - 1] = 0x0;
-    hash_insert(LIT_INTEGER, text);
+    yylval.terminal_symbol = hash_insert(LIT_INTEGER, text);
     free(text);
     return LIT_INTEGER;
 }
@@ -85,7 +85,7 @@ int isRunning(void);
     text = (char*) calloc(textlen, sizeof(char));
     strncpy(text, yytext, textlen);
     text[textlen - 1] = 0x0;
-    hash_insert(LIT_REAL, text);
+    yylval.terminal_symbol = hash_insert(LIT_REAL, text);
     free(text);
     return LIT_REAL;
 }
@@ -96,7 +96,7 @@ int isRunning(void);
     text = (char*) calloc(textlen, sizeof(char));
     strncpy(text,&yytext[1],textlen);
     text[textlen - 1] = 0x0;
-    hash_insert(LIT_CHAR, text);
+    yylval.terminal_symbol = hash_insert(LIT_CHAR, text);
     free(text);
     return LIT_CHAR;
 }

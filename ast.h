@@ -21,20 +21,26 @@
 #define SYMBOL_LONE_MINUS  15
 #define SYMBOL_NOT         16
 #define SYMBOL_IDENTIFIER  17
+#define SYMBOL_PARENTHESIS 18
+#define SYMBOL_BLOCK        19
+#define SYMBOL_RETURN       20
+#define SYMBOL_function_call 21
+#define SYMBOL_LIT_CHAR         22
+#define SYMBOL_LIT_REAL         23
+#define SYMBOL_LIT_INTEGER      24
+#define SYMBOL_VECTOR           25
+#define SYMBOL_STRING           26
+#define SYMBOL_paramlist        27
+#define SYMBOL_READ             28
+#define SYMBOL_PRINT            29
+#define SYMBOL_STRINGCONCAT     30
 
-/*#define SYMBOL_INTEGER      
-#define SYMBOL_REAL         
-#define SYMBOL_CHAR
-#define SYMBOL_STRING 
-*/
-/*#define SYMBOL_WHEN         
+/*
+#define SYMBOL_WHEN         
 #define SYMBOL_THEN         
 #define SYMBOL_ELSE         
 #define SYMBOL_WHILE        
-#define SYMBOL_FOR          
-#define SYMBOL_READ         
-#define SYMBOL_RETURN       
-#define SYMBOL_PRINT        
+#define SYMBOL_FOR                  
 #define SYMBOL_TO    não sei se precisa disso*/              
 
 typedef struct node{

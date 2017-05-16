@@ -85,10 +85,9 @@ void ast_print_node(AST *node){ //incomplete
             case SYMBOL_THEN    :   fprintf(stderr,"SYMBOL_THEN"); break;
             case SYMBOL_ELSE    :   fprintf(stderr,"SYMBOL_ELSE"); break;
             case SYMBOL_WHILE   :   fprintf(stderr,"SYMBOL_WHILE"); break;
-            case SYMBOL_FOR     :   fprintf(stderr,"SYMBOL_FOR"); break;
+            case SYMBOL_FOR     :   fprintf(stderr,"SYMBOL_FOR"); break;*/
             case SYMBOL_READ    :   fprintf(stderr,"SYMBOL_READ"); break;
-            case SYMBOL_RETURN  :   fprintf(stderr,"SYMBOL_RETURN"); break;
-            case SYMBOL_PRINT   :   fprintf(stderr,"SYMBOL_PRINT"); break;*/
+            case SYMBOL_PRINT   :   fprintf(stderr,"SYMBOL_PRINT"); break;
             case SYMBOL_CMD     :   fprintf(stderr,"SYMBOL_CMD"); break; 
             case SYMBOL_ASSIGN  :   fprintf(stderr,"SYMBOL_ASSIGN"); break;
             case SYMBOL_SUM     :   fprintf(stderr,"SYMBOL_SUM"); break;
@@ -104,11 +103,18 @@ void ast_print_node(AST *node){ //incomplete
             case SYMBOL_AND   :   fprintf(stderr,"SYMBOL_AND"); break;
             case SYMBOL_OR    :   fprintf(stderr,"SYMBOL_OR"); break;
             case SYMBOL_IDENTIFIER  :   fprintf(stderr,"SYMBOL_IDENTIFIER"); break;
-/*            case SYMBOL_INTEGER    :   fprintf(stderr,"SYMBOL_INTEGER"); break;
-            case SYMBOL_REAL       :   fprintf(stderr,"SYMBOL_REAL"); break;
-            case SYMBOL_CHAR       :   fprintf(stderr,"SYMBOL_CHAR"); break;
+            case SYMBOL_LIT_INTEGER    :   fprintf(stderr,"SYMBOL_LIT_INTEGER"); break;
+            case SYMBOL_LIT_REAL       :   fprintf(stderr,"SYMBOL_REAL"); break;
+            case SYMBOL_LIT_CHAR       :   fprintf(stderr,"SYMBOL_CHAR"); break;
             case SYMBOL_STRING     :   fprintf(stderr,"SYMBOL_STRING"); break;
-*/            case SYMBOL_LONE_MINUS     :   fprintf(stderr,"LONE_MINUS"); break;
+            case SYMBOL_LONE_MINUS     :   fprintf(stderr,"LONE_MINUS"); break;
+            case SYMBOL_RETURN     :   fprintf(stderr,"SYMBOL_RETURN"); break;
+            case SYMBOL_VECTOR      :   fprintf(stderr,"SYMBOL_VECTOR"); break;
+            case SYMBOL_function_call      :   fprintf(stderr,"SYMBOL_function_call"); break;
+            case SYMBOL_BLOCK      :   fprintf(stderr,"SYMBOL_BLOCK"); break;
+            case SYMBOL_STRINGCONCAT      :   fprintf(stderr,"SYMBOL_STRINGCONCAT"); break;
+            
+
         }
             
         fprintf(stderr,"\n");
