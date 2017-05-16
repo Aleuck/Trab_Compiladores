@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <stdio.h>
 #include "ast.h"
 
 AST *ast_create_node(int node_type){
@@ -30,7 +32,7 @@ int ast_add_son(AST *father, AST *son){
         father->son[i] = son;
     }else
     {
-        printf(stderr, "error: no space for kids in this family\n");
+        fprintf(stderr, "error: no space for kids in this family\n");
         return 666;
     }
     return 0;
@@ -41,7 +43,7 @@ AST *ast_insert(int node_type, HASH_NODE *symbol, AST *son0, AST *son1, AST *son
     
     newnode = ast_create_node(node_type);
     if(!newnode){
-        printf(stderr, "error: insert - newnode\n");
+        fprintf(stderr, "error: insert - newnode\n");
         return 0;}
 
     newnode->symbol = symbol;
@@ -60,7 +62,7 @@ void ast_print(int level, AST *root){
 
     if(root){
         for(i=0 ; i<level; i++)
-            printf("    ");
+            fprintf(stderr,"    ");
         
         ast_print_node(root);
         
@@ -68,7 +70,7 @@ void ast_print(int level, AST *root){
         {
             if(root->son[i])
             {
-                ast_print(root->son[i]);
+                ast_print(level+1, root->son[i]);
             }
         }
     }
@@ -76,39 +78,39 @@ void ast_print(int level, AST *root){
 void ast_print_node(AST *node){ //incomplete
 
     if(node){
-        switch(root->node_type){
+        switch(node->node_type){
             
 
-/*            case SYMBOL_WHEN    :   printf("SYMBOL_WHEN"); break;
-            case SYMBOL_THEN    :   printf("SYMBOL_THEN"); break;
-            case SYMBOL_ELSE    :   printf("SYMBOL_ELSE"); break;
-            case SYMBOL_WHILE   :   printf("SYMBOL_WHILE"); break;
-            case SYMBOL_FOR     :   printf("SYMBOL_FOR"); break;
-            case SYMBOL_READ    :   printf("SYMBOL_READ"); break;
-            case SYMBOL_RETURN  :   printf("SYMBOL_RETURN"); break;
-            case SYMBOL_PRINT   :   printf("SYMBOL_PRINT"); break;*/
-            case SYMBOL_CMD     :   printf("SYMBOL_CMD"); break; 
-            case SYMBOL_ASSIGN  :   printf("SYMBOL_ASSIGN"); break;
-            case SYMBOL_SUM     :   printf("SYMBOL_SUM"); break;
-            case SYMBOL_SUBT    :   printf("SYMBOL_SUBT"); break;
-            case SYMBOL_MULT    :   printf("SYMBOL_MULT"); break;
-            case SYMBOL_DIV     :   printf("SYMBOL_DIV"); break;
-            case SYMBOL_LESS    :   printf("SYMBOL_LESS"); break;
-            case SYMBOL_GREATER :   printf("SYMBOL_GREATER"); break;
-            case SYMBOL_LE    :   printf("SYMBOL_LE"); break;
-            case SYMBOL_GE    :   printf("SYMBOL_GE"); break;
-            case SYMBOL_EQ    :   printf("SYMBOL_EQ"); break;
-            case SYMBOL_NE    :   printf("SYMBOL_NE"); break;
-            case SYMBOL_AND   :   printf("SYMBOL_AND"); break;
-            case SYMBOL_OR    :   printf("SYMBOL_OR"); break;
-            case SYMBOL_IDENTIFIER  :   printf("SYMBOL_IDENTIFIER"); break;
-/*            case SYMBOL_INTEGER    :   printf("SYMBOL_INTEGER"); break;
-            case SYMBOL_REAL       :   printf("SYMBOL_REAL"); break;
-            case SYMBOL_CHAR       :   printf("SYMBOL_CHAR"); break;
-            case SYMBOL_STRING     :   printf("SYMBOL_STRING"); break;
-*/            case SYMBOL_LONE_MINUS     :   printf("LONE_MINUS"); break;
+/*            case SYMBOL_WHEN    :   fprintf(stderr,"SYMBOL_WHEN"); break;
+            case SYMBOL_THEN    :   fprintf(stderr,"SYMBOL_THEN"); break;
+            case SYMBOL_ELSE    :   fprintf(stderr,"SYMBOL_ELSE"); break;
+            case SYMBOL_WHILE   :   fprintf(stderr,"SYMBOL_WHILE"); break;
+            case SYMBOL_FOR     :   fprintf(stderr,"SYMBOL_FOR"); break;
+            case SYMBOL_READ    :   fprintf(stderr,"SYMBOL_READ"); break;
+            case SYMBOL_RETURN  :   fprintf(stderr,"SYMBOL_RETURN"); break;
+            case SYMBOL_PRINT   :   fprintf(stderr,"SYMBOL_PRINT"); break;*/
+            case SYMBOL_CMD     :   fprintf(stderr,"SYMBOL_CMD"); break; 
+            case SYMBOL_ASSIGN  :   fprintf(stderr,"SYMBOL_ASSIGN"); break;
+            case SYMBOL_SUM     :   fprintf(stderr,"SYMBOL_SUM"); break;
+            case SYMBOL_SUBT    :   fprintf(stderr,"SYMBOL_SUBT"); break;
+            case SYMBOL_MULT    :   fprintf(stderr,"SYMBOL_MULT"); break;
+            case SYMBOL_DIV     :   fprintf(stderr,"SYMBOL_DIV"); break;
+            case SYMBOL_LESS    :   fprintf(stderr,"SYMBOL_LESS"); break;
+            case SYMBOL_GREATER :   fprintf(stderr,"SYMBOL_GREATER"); break;
+            case SYMBOL_LE    :   fprintf(stderr,"SYMBOL_LE"); break;
+            case SYMBOL_GE    :   fprintf(stderr,"SYMBOL_GE"); break;
+            case SYMBOL_EQ    :   fprintf(stderr,"SYMBOL_EQ"); break;
+            case SYMBOL_NE    :   fprintf(stderr,"SYMBOL_NE"); break;
+            case SYMBOL_AND   :   fprintf(stderr,"SYMBOL_AND"); break;
+            case SYMBOL_OR    :   fprintf(stderr,"SYMBOL_OR"); break;
+            case SYMBOL_IDENTIFIER  :   fprintf(stderr,"SYMBOL_IDENTIFIER"); break;
+/*            case SYMBOL_INTEGER    :   fprintf(stderr,"SYMBOL_INTEGER"); break;
+            case SYMBOL_REAL       :   fprintf(stderr,"SYMBOL_REAL"); break;
+            case SYMBOL_CHAR       :   fprintf(stderr,"SYMBOL_CHAR"); break;
+            case SYMBOL_STRING     :   fprintf(stderr,"SYMBOL_STRING"); break;
+*/            case SYMBOL_LONE_MINUS     :   fprintf(stderr,"LONE_MINUS"); break;
         }
             
-        printf("\n");
+        fprintf(stderr,"\n");
     }
 }
