@@ -80,12 +80,6 @@ void ast_print_node(AST *node){ //incomplete
     if(node){
         switch(node->node_type){
             
-
-/*            case SYMBOL_WHEN    :   fprintf(stderr,"SYMBOL_WHEN"); break;
-            case SYMBOL_THEN    :   fprintf(stderr,"SYMBOL_THEN"); break;
-            case SYMBOL_ELSE    :   fprintf(stderr,"SYMBOL_ELSE"); break;
-            case SYMBOL_WHILE   :   fprintf(stderr,"SYMBOL_WHILE"); break;
-            case SYMBOL_FOR     :   fprintf(stderr,"SYMBOL_FOR"); break;*/
             case SYMBOL_READ    :   fprintf(stderr,"SYMBOL_READ"); break;
             case SYMBOL_PRINT   :   fprintf(stderr,"SYMBOL_PRINT"); break;
             case SYMBOL_CMD     :   fprintf(stderr,"SYMBOL_CMD"); break; 
@@ -113,9 +107,30 @@ void ast_print_node(AST *node){ //incomplete
             case SYMBOL_function_call      :   fprintf(stderr,"SYMBOL_function_call"); break;
             case SYMBOL_BLOCK      :   fprintf(stderr,"SYMBOL_BLOCK"); break;
             case SYMBOL_STRINGCONCAT      :   fprintf(stderr,"SYMBOL_STRINGCONCAT"); break;
-            
+            case SYMBOL_GLOB_DECL      :   fprintf(stderr,"SYMBOL_GLOB_DECL"); break;
+            case SYMBOL_function_decl      :   fprintf(stderr,"SYMBOL_function_decl"); break;
+            case SYMBOL_paramlist      :   fprintf(stderr,"SYMBOL_paramlist"); break;
+            case SYMBOL_BYTE       :   fprintf(stderr,"SYMBOL_BYTE "); break;
+            case SYMBOL_DOUBLE     :   fprintf(stderr,"SYMBOL_DOUBLE"); break;
+            case SYMBOL_FLOAT      :   fprintf(stderr,"SYMBOL_FLOAT"); break;
+            case SYMBOL_LONG       :   fprintf(stderr,"SYMBOL_LONG"); break;
+            case SYMBOL_SHORT      :   fprintf(stderr,"SYMBOL_SHORT"); break;
+            case SYMBOL_INITIAL_VALUE    :   fprintf(stderr,"SYMBOL_INITIAL_VALUE "); break;
+            case SYMBOL_VECTOR_DECL      :   fprintf(stderr,"SYMBOL_VECTOR_DECL "); break;
+            case SYMBOL_VECTOR_SIZE      :   fprintf(stderr,"SYMBOL_VECTOR_SIZE "); break;
+            case SYMBOL_VAR_ASSIGN       :   fprintf(stderr,"SYMBOL_VAR_ASSIGN"); break;
+            case SYMBOL_VECTOR_ASSIGN    :   fprintf(stderr,"SYMBOL_VECTOR_ASSIGN"); break;
+            case SYMBOL_WHENTHEN         :   fprintf(stderr,"SYMBOL_WHENTHEN"); break;
+            case SYMBOL_WHENTHENELSE     :   fprintf(stderr,"SYMBOL_WHENTHENELSE"); break;
+            case SYMBOL_WHILE            :   fprintf(stderr,"SYMBOL_WHILE"); break;
+            case SYMBOL_FOR              :   fprintf(stderr,"SYMBOL_FOR "); break;
 
-        }
+            
+            
+             
+             
+             
+         }   
             
         fprintf(stderr,"\n");
     }

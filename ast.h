@@ -34,14 +34,25 @@
 #define SYMBOL_READ             28
 #define SYMBOL_PRINT            29
 #define SYMBOL_STRINGCONCAT     30
+#define SYMBOL_GLOB_DECL        31
+#define SYMBOL_function_decl    32
+#define SYMBOL_VAR_DECL         33
+#define SYMBOL_BYTE             34
+#define SYMBOL_DOUBLE           35
+#define SYMBOL_FLOAT            36
+#define SYMBOL_LONG             37
+#define SYMBOL_SHORT            38
+#define SYMBOL_INITIAL_VALUE    39
+#define SYMBOL_VECTOR_DECL      40
+#define SYMBOL_VECTOR_SIZE      41
+#define SYMBOL_VAR_ASSIGN       42
+#define SYMBOL_VECTOR_ASSIGN    43
 
-/*
-#define SYMBOL_WHEN         
-#define SYMBOL_THEN         
-#define SYMBOL_ELSE         
-#define SYMBOL_WHILE        
-#define SYMBOL_FOR                  
-#define SYMBOL_TO    não sei se precisa disso*/              
+#define SYMBOL_WHENTHEN         44
+#define SYMBOL_WHENTHENELSE     45  
+#define SYMBOL_WHILE            46
+#define SYMBOL_FOR              47  
+             
 
 typedef struct node{
     int node_type;
