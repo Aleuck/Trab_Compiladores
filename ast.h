@@ -52,6 +52,7 @@
 #define SYMBOL_WHENTHENELSE     45  
 #define SYMBOL_WHILE            46
 #define SYMBOL_FOR              47  
+#define SYMBOL_DECL_PARAMLIST   48
              
 
 typedef struct node{

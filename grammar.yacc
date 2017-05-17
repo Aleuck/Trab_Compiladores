@@ -67,8 +67,8 @@ AST *ast_root;
 
 %type <ast_node> glob_decl_list glob_decl var_decl cmd_list cmd exp block string_concat paramlist1 paramlist param function_call 
 flow_ctrl function_decl vector_decl decl_paramlistv decl_paramlist type initial_value initial_values
-initial_values1 vector_size assign whenthen whenthenelse while for
-%type <terminal_symbol> TK_IDENTIFIER LIT_INTEGER LIT_REAL LIT_CHAR simple_string LIT_STRING
+initial_values1 vector_size assign whenthen whenthenelse while for simple_string string
+%type <terminal_symbol> TK_IDENTIFIER LIT_INTEGER LIT_REAL LIT_CHAR LIT_STRING
 
 
 %error-verbose
@@ -144,8 +144,8 @@ decl_paramlistv:    decl_paramlist      {$$ = $1;}
                     |                   {$$ = NULL;}
                     ;
 
-decl_paramlist: type TK_IDENTIFIER ',' decl_paramlist
-                |type TK_IDENTIFIER
+decl_paramlist: type TK_IDENTIFIER ',' decl_paramlist   {$$ = ast_insert(SYMBOL_DECL_PARAMLIST, $2, $1, $4, 0, 0);}
+                |type TK_IDENTIFIER     {$$ = ast_insert(SYMBOL_DECL_PARAMLIST, $2, $1, 0, 0, 0);}
                 ;
 
 
@@ -182,16 +182,20 @@ paramlist1: param ',' paramlist1    {$$ = ast_insert(SYMBOL_paramlist, 0, $1, $3
             ;
 
 param:      exp                  {$$ = $1;}
-            |string_concat       {$$ = $1;}
+            |string              {$$ = $1;}
             ;
 
-string_concat: simple_string string_concat  {$$ = ast_insert(SYMBOL_STRINGCONCAT, $1, $2, 0, 0, 0);}
-               |               {$$ = NULL;}
+string: LIT_STRING      {$$ = ast_insert(SYMBOL_STRING, $1, 0, 0, 0, 0);}
+        ;
+
+//string concat e simple string servem apenas para o comando print
+string_concat: simple_string string_concat  {$1->son[0] = $2; $$ = $1;}
+               |simple_string               {$$ = $1;}
                ;
 
-simple_string:  LIT_STRING  {$$ = $1;}
-            |TK_IDENTIFIER  {$$ = $1;}
-            ;
+simple_string:  LIT_STRING      {$$ = ast_insert(SYMBOL_STRINGCONCAT, $1, 0, 0, 0, 0);}
+                |TK_IDENTIFIER  {$$ = ast_insert(SYMBOL_STRINGCONCAT, $1, 0, 0, 0, 0);}
+                ;
 
 exp:        '(' exp ')'     {$$ = ast_insert(SYMBOL_PARENTHESIS, 0, $2, 0, 0, 0);}
             |'!' exp        {$$ = ast_insert(SYMBOL_NOT, 0, $2, 0, 0, 0);}
@@ -222,4 +226,14 @@ void yyerror(const char *s) {
     printf("Parse error. \nLine Number: %d - %s\n", getLineNumber(), s);
 
     exit(3);
+}
+
+void uncompile(AST *ast_root, FILE *output){
+    switch(ast_root->node_type){
+        case 1: ;
+    
+    //switch case gigante com fprintf pra cada caso
+    
+    
+    }
 }

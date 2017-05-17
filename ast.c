@@ -124,12 +124,8 @@ void ast_print_node(AST *node){ //incomplete
             case SYMBOL_WHENTHENELSE     :   fprintf(stderr,"SYMBOL_WHENTHENELSE"); break;
             case SYMBOL_WHILE            :   fprintf(stderr,"SYMBOL_WHILE"); break;
             case SYMBOL_FOR              :   fprintf(stderr,"SYMBOL_FOR "); break;
-
+            case SYMBOL_DECL_PARAMLIST   :   fprintf(stderr,"SYMBOL_DECL_PARAMLIST "); break;
             
-            
-             
-             
-             
          }   
             
         fprintf(stderr,"\n");
