@@ -422,7 +422,7 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                             uncompile(ast_root->son[0], output);
                                             fprintf(output,") then ");
                                             uncompile(ast_root->son[1], output);
-                                            fprintf(output,"else ");
+                                            fprintf(output," else ");
                                             uncompile(ast_root->son[2], output);
                                             break;
             case SYMBOL_WHILE           :   fprintf(output,"while (");
