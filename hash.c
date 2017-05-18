@@ -30,7 +30,8 @@ HASH_NODE* hash_insert(int token, char *text) {
     HASH_NODE* base, *new;
     int textlen = strlen(text);
 
-    if (hash_search(text) != NULL) {
+    new = hash_search(text);
+    if (new != NULL) {
 	    return new;			//erro caso já exista, retorna o ponteiro para o nó
     }
 
