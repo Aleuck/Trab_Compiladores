@@ -348,7 +348,7 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                             uncompile(ast_root->son[1], output); 
                                             break; 
             case SYMBOL_READ    :   fprintf(output,"read "); 
-                                    uncompile(ast_root->son[0], output);
+                                    fprintf(output,ast_root->symbol->text);
                                     break;
             case SYMBOL_PRINT   :   fprintf(output,"print "); 
                                     uncompile(ast_root->son[0], output);
