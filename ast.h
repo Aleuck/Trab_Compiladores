@@ -44,7 +44,6 @@
 #define SYMBOL_SHORT            38
 #define SYMBOL_INITIAL_VALUE    39
 #define SYMBOL_VECTOR_DECL      40
-#define SYMBOL_VECTOR_SIZE      41
 #define SYMBOL_VAR_ASSIGN       42
 #define SYMBOL_VECTOR_ASSIGN    43
 

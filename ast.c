@@ -81,7 +81,6 @@ void ast_print_node(AST *node){ //incomplete
         switch(node->node_type){
             
             case SYMBOL_CMD     :   fprintf(stderr,"CMD"); break; 
-            case SYMBOL_ASSIGN  :   fprintf(stderr,"ASSIGN"); break;
             case SYMBOL_SUM     :   fprintf(stderr,"SUM"); break;
             case SYMBOL_SUBT    :   fprintf(stderr,"SUBT"); break;
             case SYMBOL_MULT    :   fprintf(stderr,"MULT"); break;
@@ -120,7 +119,6 @@ void ast_print_node(AST *node){ //incomplete
             case SYMBOL_SHORT      :   fprintf(stderr,"SHORT"); break;
             case SYMBOL_INITIAL_VALUE    :   fprintf(stderr,"INITIAL_VALUE "); break;
             case SYMBOL_VECTOR_DECL      :   fprintf(stderr,"VECTOR_DECL "); break;
-            case SYMBOL_VECTOR_SIZE      :   fprintf(stderr,"VECTOR_SIZE "); break;
             case SYMBOL_VAR_ASSIGN       :   fprintf(stderr,"VAR_ASSIGN"); break;
             case SYMBOL_VECTOR_ASSIGN    :   fprintf(stderr,"VECTOR_ASSIGN"); break;
             case SYMBOL_WHENTHEN         :   fprintf(stderr,"WHENTHEN"); break;
