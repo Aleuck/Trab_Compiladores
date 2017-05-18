@@ -331,6 +331,11 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                             }else{
                                                 fprintf(output,ast_root->symbol->text);
                                             }
+                                            if(ast_root->son[1])
+                                            {
+                                                fprintf(output, " ");
+                                                uncompile(ast_root->son[1], output);
+                                            }
                                             break;
                                             
             case SYMBOL_VECTOR         :    fprintf(output,ast_root->symbol->text); 
