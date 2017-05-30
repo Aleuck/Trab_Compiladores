@@ -29,6 +29,7 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Gerando Programa descompilado\n");
     uncompile(ast_root, output);
     fprintf(stderr, "Sucesssooo!! Parabenses\n");
+	hash_print(void);
 
 	exit(0);	//EOF and no error
 }

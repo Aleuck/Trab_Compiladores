@@ -3,10 +3,13 @@
 
 #define HASH_SIZE 997
 
+#include "ast.h"
+
 typedef struct hash_node {
     char *text;
     int token;
     struct hash_node *next;
+	struct node* decl;
 } HASH_NODE;
 
 HASH_NODE *table[HASH_SIZE];
