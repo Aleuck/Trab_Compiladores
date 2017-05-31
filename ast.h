@@ -2,7 +2,6 @@
 #define __TREE_HEADER
 
 #define MAX_CHILDREN 4
-#include "hash.h"
 
 #define AST_CMD         1
 #define AST_ASSIGN      2
@@ -53,6 +52,7 @@
 #define AST_FOR              47  
 #define AST_DECL_PARAMLIST   48
              
+typedef struct hash_node HASH_NODE;
 
 typedef struct node{
     int node_type;
