@@ -78,8 +78,8 @@ initial_values1 vector_size assign whenthen whenthenelse while for simple_string
 program:    glob_decl_list                {ast_root = $1; ast_print(0, ast_root);}
             ;
 
-glob_decl_list: glob_decl ';' glob_decl_list    {$$ = ast_insert(AST_GLOB_DECL, 0, $1, $3, 0, 0);}
-            |glob_decl ';'                      {$$ = $1;}
+glob_decl_list: glob_decl_list glob_decl ';' {$$ = ast_insert(AST_GLOB_DECL, 0, $2, $1, 0, 0);}
+            |glob_decl ';'                   {$$ = $1;}
             ;
 
 glob_decl:  function_decl           {$$ = $1;}
@@ -87,7 +87,7 @@ glob_decl:  function_decl           {$$ = $1;}
             |vector_decl            {$$ = $1;}
             ;
 
-cmd_list:   cmd ';' cmd_list        {$$ = ast_insert(AST_CMD, 0, $1, $3, 0, 0);}
+cmd_list:   cmd_list ';' cmd        {$$ = ast_insert(AST_CMD, 0, $3, $1, 0, 0);}
             |cmd                    {$$ = $1;}
             ;
             
@@ -128,7 +128,7 @@ initial_values: initial_values1     {$$ = $1;}
                 |                   {$$ =  NULL;}
                 ;
                 
-initial_values1: initial_value initial_values1  {$1->son[1] = $2; $$ = $1;}
+initial_values1: initial_values1 initial_value  {$2->son[0] = $1; $$ = $2;}
                  |initial_value                 {$$ = $1;}
                  ;    
 
@@ -144,7 +144,7 @@ decl_paramlistv:    decl_paramlist      {$$ = $1;}
                     |                   {$$ = NULL;}
                     ;
 
-decl_paramlist: type TK_IDENTIFIER ',' decl_paramlist   {$$ = ast_insert(AST_DECL_PARAMLIST, $2, $1, $4, 0, 0);}
+decl_paramlist: decl_paramlist ',' type TK_IDENTIFIER   {$$ = ast_insert(AST_DECL_PARAMLIST, $4, $3, $1, 0, 0);}
                 |type TK_IDENTIFIER     {$$ = ast_insert(AST_DECL_PARAMLIST, $2, $1, 0, 0, 0);}
                 ;
 
@@ -177,7 +177,7 @@ paramlist:  paramlist1  {$$ = $1;}
             |           {$$ = NULL;}
             ;
 
-paramlist1: param ',' paramlist1    {$$ = ast_insert(AST_paramlist, 0, $1, $3, 0, 0);}
+paramlist1: paramlist1 ',' param    {$$ = ast_insert(AST_paramlist, 0, $3, $1, 0, 0);}
             |param                  {$$ = $1;}
             ;
 
@@ -189,7 +189,7 @@ string: LIT_STRING      {$$ = ast_insert(AST_STRING, $1, 0, 0, 0, 0);}
         ;
 
 //string concat e simple string servem apenas para o comando print
-string_concat: simple_string string_concat  {$1->son[0] = $2; $$ = $1;}
+string_concat: string_concat simple_string  {$2->son[0] = $1; $$ = $2;}
                |simple_string               {$$ = $1;}
                ;
 
@@ -199,24 +199,24 @@ simple_string:  LIT_STRING      {$$ = ast_insert(AST_STRINGCONCAT, $1, 0, 0, 0, 
 
 exp:        '(' exp ')'     {$$ = ast_insert(AST_PARENTHESIS, 0, $2, 0, 0, 0);}
             |'!' exp        {$$ = ast_insert(AST_NOT, 0, $2, 0, 0, 0);}
-            |exp '+' exp    {$$ = ast_insert(AST_SUM, 0, $1, $3, 0, 0);}
-            |exp '-' exp    {$$ = ast_insert(AST_SUBT, 0, $1, $3, 0, 0);}
-            |exp '*' exp    {$$ = ast_insert(AST_MULT, 0, $1, $3, 0, 0);}
-            |exp '/' exp    {$$ = ast_insert(AST_DIV, 0, $1, $3, 0, 0);}
-            |exp '>' exp    {$$ = ast_insert(AST_GREATER, 0, $1, $3, 0, 0);}
-            |exp '<' exp    {$$ = ast_insert(AST_LESS, 0, $1, $3, 0, 0);}
-            |exp OPERATOR_EQ exp    {$$ = ast_insert(AST_EQ, 0, $1, $3, 0, 0);}
-            |exp OPERATOR_NE exp    {$$ = ast_insert(AST_NE, 0, $1, $3, 0, 0);}
-            |exp OPERATOR_GE exp    {$$ = ast_insert(AST_GE, 0, $1, $3, 0, 0);}
-            |exp OPERATOR_LE exp    {$$ = ast_insert(AST_LE, 0, $1, $3, 0, 0);}
+            |exp '+' exp    {$$ = ast_insert(AST_SUM, 0, $3, $1, 0, 0);}
+            |exp '-' exp    {$$ = ast_insert(AST_SUBT, 0, $3, $1, 0, 0);}
+            |exp '*' exp    {$$ = ast_insert(AST_MULT, 0, $3, $1, 0, 0);}
+            |exp '/' exp    {$$ = ast_insert(AST_DIV, 0, $3, $1, 0, 0);}
+            |exp '>' exp    {$$ = ast_insert(AST_GREATER, 0, $3, $1, 0, 0);}
+            |exp '<' exp    {$$ = ast_insert(AST_LESS, 0, $3, $1, 0, 0);}
+            |exp OPERATOR_EQ exp    {$$ = ast_insert(AST_EQ, 0, $3, $1, 0, 0);}
+            |exp OPERATOR_NE exp    {$$ = ast_insert(AST_NE, 0, $3, $1, 0, 0);}
+            |exp OPERATOR_GE exp    {$$ = ast_insert(AST_GE, 0, $3, $1, 0, 0);}
+            |exp OPERATOR_LE exp    {$$ = ast_insert(AST_LE, 0, $3, $1, 0, 0);}
             |TK_IDENTIFIER          {$$ = ast_insert(AST_IDENTIFIER, $1, 0,0,0,0);}
             |TK_IDENTIFIER '[' exp ']'  {$$ = ast_insert(AST_VECTOR, $1, $3,0,0,0);}
             |LIT_INTEGER            {$$ = ast_insert(AST_LIT_INTEGER, $1, 0,0,0,0);}
             |LIT_REAL               {$$ = ast_insert(AST_LIT_REAL, $1, 0,0,0,0);}
             |LIT_CHAR               {$$ = ast_insert(AST_LIT_CHAR, $1, 0,0,0,0);}
             |function_call          {$$ = $1;}
-            |exp OPERATOR_AND exp   {$$ = ast_insert(AST_AND, 0, $1, $3, 0, 0);}
-            |exp OPERATOR_OR exp    {$$ = ast_insert(AST_OR, 0, $1, $3, 0, 0);}
+            |exp OPERATOR_AND exp   {$$ = ast_insert(AST_AND, 0, $3, $1, 0, 0);}
+            |exp OPERATOR_OR exp    {$$ = ast_insert(AST_OR, 0, $3, $1, 0, 0);}
             |'-' exp %prec LONE_MINUS     {$$ = ast_insert(AST_LONE_MINUS, 0, $2, 0, 0, 0);}
             ;
 
@@ -233,58 +233,60 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
     if(ast_root && output){
         switch(ast_root->node_type){
             
-            case AST_CMD     :   uncompile(ast_root->son[0], output);
+            case AST_CMD     :      uncompile(ast_root->son[1], output);
                                     fprintf(output,";\n");
-                                    uncompile(ast_root->son[1], output); 
+                                    uncompile(ast_root->son[0], output);
+                                    
+                                     
                                     break; 
 
-            case AST_SUM     :   uncompile(ast_root->son[0], output);
+            case AST_SUM     :   uncompile(ast_root->son[1], output);
                                     fprintf(output,"+"); 
-                                    uncompile(ast_root->son[1], output);
+                                    uncompile(ast_root->son[0], output);
                                     break;
-            case AST_SUBT    :   uncompile(ast_root->son[0], output);
+            case AST_SUBT    :   uncompile(ast_root->son[1], output);
                                     fprintf(output,"-"); 
-                                    uncompile(ast_root->son[1], output);
+                                    uncompile(ast_root->son[0], output);
                                     break;
-            case AST_MULT    :   uncompile(ast_root->son[0], output);
+            case AST_MULT    :   uncompile(ast_root->son[1], output);
                                     fprintf(output,"*"); 
-                                    uncompile(ast_root->son[1], output);
+                                    uncompile(ast_root->son[0], output);
                                     break;
-            case AST_DIV     :   uncompile(ast_root->son[0], output);
+            case AST_DIV     :   uncompile(ast_root->son[1], output);
                                     fprintf(output,"/"); 
-                                    uncompile(ast_root->son[1], output);
+                                    uncompile(ast_root->son[0], output);
                                     break;
-            case AST_GREATER :   uncompile(ast_root->son[0], output);
+            case AST_GREATER :   uncompile(ast_root->son[1], output);
                                     fprintf(output,">"); 
-                                    uncompile(ast_root->son[1], output);
+                                    uncompile(ast_root->son[0], output);
                                     break;
-            case AST_LESS    :   uncompile(ast_root->son[0], output);
+            case AST_LESS    :   uncompile(ast_root->son[1], output);
                                     fprintf(output,"<"); 
-                                    uncompile(ast_root->son[1], output);
+                                    uncompile(ast_root->son[0], output);
                                     break;
-            case AST_LE    :     uncompile(ast_root->son[0], output);
+            case AST_LE    :     uncompile(ast_root->son[1], output);
                                     fprintf(output,"<="); 
-                                    uncompile(ast_root->son[1], output);
+                                    uncompile(ast_root->son[0], output);
                                     break;
-            case AST_GE    :     uncompile(ast_root->son[0], output);
+            case AST_GE    :     uncompile(ast_root->son[1], output);
                                     fprintf(output,">="); 
-                                    uncompile(ast_root->son[1], output);
+                                    uncompile(ast_root->son[0], output);
                                     break;
-            case AST_EQ    :     uncompile(ast_root->son[0], output);
+            case AST_EQ    :     uncompile(ast_root->son[1], output);
                                     fprintf(output,"=="); 
-                                    uncompile(ast_root->son[1], output);
+                                    uncompile(ast_root->son[0], output);
                                     break;
-            case AST_NE    :     uncompile(ast_root->son[0], output);
+            case AST_NE    :     uncompile(ast_root->son[1], output);
                                     fprintf(output,"!="); 
-                                    uncompile(ast_root->son[1], output);
+                                    uncompile(ast_root->son[0], output);
                                     break;
-            case AST_AND   :     uncompile(ast_root->son[0], output);
+            case AST_AND   :     uncompile(ast_root->son[1], output);
                                     fprintf(output," && "); 
-                                    uncompile(ast_root->son[1], output);
+                                    uncompile(ast_root->son[0], output);
                                     break;
-            case AST_OR    :     uncompile(ast_root->son[0], output);
+            case AST_OR    :     uncompile(ast_root->son[1], output);
                                     fprintf(output," || "); 
-                                    uncompile(ast_root->son[1], output);
+                                    uncompile(ast_root->son[0], output);
                                     break;
             case AST_LONE_MINUS     :    fprintf(output,"-"); 
                                             uncompile(ast_root->son[0], output);
@@ -323,18 +325,17 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                             fprintf(output,ast_root->symbol->text); 
                                             fprintf(output,"'");
                                             break;
-            case AST_INITIAL_VALUE   :   if(ast_root->symbol->token == LIT_CHAR)
+            case AST_INITIAL_VALUE   :   if(ast_root->son[0]){
+                                            uncompile(ast_root->son[0], output);
+                                            fprintf(output," ");
+                                            }
+                                          if(ast_root->symbol->token == LIT_CHAR)
                                             {
                                                 fprintf(output,"'"); 
                                                 fprintf(output,ast_root->symbol->text); 
                                                 fprintf(output,"'");
                                             }else{
                                                 fprintf(output,ast_root->symbol->text);
-                                            }
-                                            if(ast_root->son[1])
-                                            {
-                                                fprintf(output, " ");
-                                                uncompile(ast_root->son[1], output);
                                             }
                                             break;
                                             
@@ -343,9 +344,9 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                             uncompile(ast_root->son[0], output);
                                             fprintf(output,"]");
                                             break;
-            case AST_paramlist      :    uncompile(ast_root->son[0], output);
+            case AST_paramlist      :    uncompile(ast_root->son[1], output);
                                             fprintf(output, ", ");
-                                            uncompile(ast_root->son[1], output); 
+                                            uncompile(ast_root->son[0], output); 
                                             break; 
             case AST_READ    :   fprintf(output,"read "); 
                                     fprintf(output,ast_root->symbol->text);
@@ -353,24 +354,25 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
             case AST_PRINT   :   fprintf(output,"print "); 
                                     uncompile(ast_root->son[0], output);
                                     break;
-            case AST_STRINGCONCAT    :   if(ast_root->symbol->token == LIT_STRING){
+            case AST_STRINGCONCAT    :   if(ast_root->son[0])
+                                            {
+                                                uncompile(ast_root->son[0], output);
+                                                fprintf(output, " ");
+                                            }
+                                            if(ast_root->symbol->token == LIT_STRING){
                                                 fprintf(output, "\"");
                                                 fprintf(output,ast_root->symbol->text); 
                                                 fprintf(output, "\"");
                                             }else{
                                                 fprintf(output,ast_root->symbol->text);
                                             }
-                                            if(ast_root->son[0])
-                                            {
-                                                fprintf(output, " ");
-                                                uncompile(ast_root->son[0], output);
-                                            }
+
                                             break;
-            case AST_GLOB_DECL       :   uncompile(ast_root->son[0], output);
-                                            fprintf(output,";\n");
-                                            uncompile(ast_root->son[1], output); 
+            case AST_GLOB_DECL       :   uncompile(ast_root->son[1], output);
                                             if(ast_root->son[1]->node_type != AST_GLOB_DECL)     //se for o último da recursão, imprime ';'
                                                 fprintf(output,";\n");
+                                            uncompile(ast_root->son[0], output); 
+                                            fprintf(output,";\n");
                                             break; 
             case AST_function_decl   :   uncompile(ast_root->son[0], output);
                                             fprintf(output, " ");
@@ -439,14 +441,15 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                             fprintf(output,") ");
                                             uncompile(ast_root->son[2], output);
                                             break;
-            case AST_DECL_PARAMLIST  :   uncompile(ast_root->son[0], output);
-                                            fprintf(output, " ");
-                                            fprintf(output,ast_root->symbol->text);
+            case AST_DECL_PARAMLIST  :    
                                             if(ast_root->son[1])                //if not the end of recursion (there are more params)
                                             {
-                                                fprintf(output,", ");
                                                 uncompile(ast_root->son[1], output);
+                                                fprintf(output,", ");
                                             }
+                                            uncompile(ast_root->son[0], output);
+                                            fprintf(output, " ");
+                                            fprintf(output,ast_root->symbol->text);
                                             break;
             
          }
