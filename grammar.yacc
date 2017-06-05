@@ -56,6 +56,7 @@ AST *ast_root;
 %token SYMBOL_VAR
 %token SYMBOL_FUNC
 %token SYMBOL_VECTOR
+%token SYMBOL_LOCAL_VAR
 
 %token TOKEN_ERROR
 
@@ -82,7 +83,7 @@ initial_values1 vector_size assign whenthen whenthenelse while for simple_string
 
 program:    glob_decl_list                {ast_root = $1; ast_print(0, ast_root);
                                             semanticSetDeclarations(ast_root);
-                                            //checkUndeclared();
+                                            checkUndeclared();
                                           }
             ;
 

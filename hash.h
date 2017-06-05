@@ -15,7 +15,8 @@ typedef struct hash_node {
 HASH_NODE *table[HASH_SIZE];
 void hash_init(void);
 HASH_NODE* hash_insert(int token, char *text);
-HASH_NODE* hash_search(char *text);
+HASH_NODE* hash_search(char *text, int token_type);
 void hash_print(void);
+HASH_NODE* hash_search_type(int token_type_wanted);
 
 #endif

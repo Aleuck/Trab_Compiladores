@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include "hash.h"
 
-int hash_code(char *text);
+int last_search_type = 0;
+int last_search_table_count = 0;
+HASH_NODE* last_search_current = 0;
 
 int hash_code(char *text) {
     int textlen = strlen(text);
@@ -30,7 +32,7 @@ HASH_NODE* hash_insert(int token_type, char *text) {
     HASH_NODE* base, *new;
     int textlen = strlen(text);
 
-    new = hash_search(text);
+    new = hash_search(text, token_type);
     if (new != NULL) {
 	    return new;			//erro caso já exista, retorna o ponteiro para o nó
     }
@@ -48,7 +50,7 @@ HASH_NODE* hash_insert(int token_type, char *text) {
 
     return table[code];
 }
-HASH_NODE* hash_search(char *text) {
+HASH_NODE* hash_search(char *text, int token_type) {
 
     int code = hash_code(text);
     int cont = 1;
@@ -60,7 +62,7 @@ HASH_NODE* hash_search(char *text) {
         if (current == NULL) {
             cont = 0;
         } else {
-            if (!strcmp(text,current->text)) {
+            if ((!strcmp(text,current->text)) && current->token_type == token_type) {
                 return current;
             } else {
                 current = current->next;
@@ -89,4 +91,54 @@ void hash_print(void) {
         }
 	}
 }
+
+HASH_NODE* hash_search_type(int token_type_wanted){
+
+    int cont, table_count;
+    HASH_NODE* current;
+
+    if(token_type_wanted == last_search_type){
+        table_count = last_search_table_count;           
+        current = last_search_current->next;        //continua de onde parou
+    }
+    else{
+        table_count = 0;
+        current = table[table_count];
+    }
+    
+    cont = 1;
+    while (cont) {
+        if (current == NULL) 
+        {
+            table_count++;
+            if(table_count == HASH_SIZE)
+            {
+                cont = 0;
+            }
+            else
+            {
+                current = table[table_count];
+            } 
+        } 
+        else 
+        {
+            if (current->token_type == token_type_wanted) 
+            {
+                last_search_current = current;
+                last_search_table_count = table_count;
+                last_search_type = token_type_wanted;
+                return current;
+            } else {
+                current = current->next;
+            }
+        }
+    }
+    
+    last_search_current = 0;
+    last_search_table_count = 0;
+    last_search_type = 0;
+    
+    return NULL;
+}
+
 
