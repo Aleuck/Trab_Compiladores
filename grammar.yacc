@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "ast.h"
 #include "hash.h"
+#include "semantics.h"
 
 void yyerror(const char *s);
 
@@ -52,6 +53,10 @@ AST *ast_root;
 %token LIT_CHAR
 %token LIT_STRING
 
+%token SYMBOL_VAR
+%token SYMBOL_FUNC
+%token SYMBOL_VECTOR
+
 %token TOKEN_ERROR
 
 //precedências:
@@ -75,7 +80,10 @@ initial_values1 vector_size assign whenthen whenthenelse while for simple_string
 
 %%
 
-program:    glob_decl_list                {ast_root = $1; ast_print(0, ast_root);}
+program:    glob_decl_list                {ast_root = $1; ast_print(0, ast_root);
+                                            semanticSetDeclarations(ast_root);
+                                            //checkUndeclared();
+                                          }
             ;
 
 glob_decl_list: glob_decl_list glob_decl ';' {$$ = ast_insert(AST_GLOB_DECL, 0, $2, $1, 0, 0);}
@@ -329,7 +337,7 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                             uncompile(ast_root->son[0], output);
                                             fprintf(output," ");
                                             }
-                                          if(ast_root->symbol->token == LIT_CHAR)
+                                          if(ast_root->symbol->token_type == LIT_CHAR)
                                             {
                                                 fprintf(output,"'"); 
                                                 fprintf(output,ast_root->symbol->text); 
@@ -359,7 +367,7 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                                 uncompile(ast_root->son[0], output);
                                                 fprintf(output, " ");
                                             }
-                                            if(ast_root->symbol->token == LIT_STRING){
+                                            if(ast_root->symbol->token_type == LIT_STRING){
                                                 fprintf(output, "\"");
                                                 fprintf(output,ast_root->symbol->text); 
                                                 fprintf(output, "\"");

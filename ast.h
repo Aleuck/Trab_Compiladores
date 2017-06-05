@@ -54,11 +54,11 @@
              
 typedef struct hash_node HASH_NODE;
 
-typedef struct node{
+typedef struct ast_node{
     int node_type;
 	int data_type;
 
-    struct node *son[MAX_CHILDREN];
+    struct ast_node *son[MAX_CHILDREN];
     HASH_NODE *symbol;
 } AST;
 

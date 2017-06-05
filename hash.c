@@ -25,7 +25,7 @@ void hash_init(){
 	}
 }
 
-HASH_NODE* hash_insert(int token, char *text) {
+HASH_NODE* hash_insert(int token_type, char *text) {
     int code = hash_code(text);
     HASH_NODE* base, *new;
     int textlen = strlen(text);
@@ -40,7 +40,7 @@ HASH_NODE* hash_insert(int token, char *text) {
     new = (HASH_NODE*) calloc(1, sizeof(HASH_NODE));
     new->text = (char*) calloc(textlen, sizeof(char));
     strcpy(new->text, text);
-    new->token = token;
+    new->token_type = token_type;
 
     new->next = base;
     base = new;
@@ -70,7 +70,7 @@ HASH_NODE* hash_search(char *text) {
     return NULL;
 }
 void node_print(HASH_NODE *node) {
-    fprintf(stderr,"token: %d - text: %s. -> ", node->token, node->text);
+    fprintf(stderr,"token_type: %d - text: %s. -> ", node->token_type, node->text);
 }
 void hash_print(void) {
 	int i;

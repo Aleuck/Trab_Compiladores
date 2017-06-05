@@ -7,8 +7,8 @@
 # Therefore, there must be a header of it to be included in scanner.l
 #
 
-etapa3: y.tab.o lex.yy.o main.o hash.o ast.o
-	gcc -o etapa4 y.tab.o lex.yy.o main.o hash.o ast.o
+etapa3: y.tab.o lex.yy.o main.o hash.o ast.o semantics.o
+	gcc -o etapa4 y.tab.o lex.yy.o main.o hash.o ast.o semantics.o
 y.tab.o: y.tab.c
 	gcc -c y.tab.c
 y.tab.c: grammar.yacc
@@ -19,6 +19,8 @@ lex.yy.c: scanner.l y.tab.h
 	flex --header-file=lex.yy.h scanner.l
 y.tab.h: grammar.yacc
 	yacc --verbose -d grammar.yacc
+semantics.o: semantics.c semantics.h
+	gcc -c semantics.c
 main.o: main.c
 	gcc -c main.c
 hash.o: hash.c hash.h

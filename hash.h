@@ -7,9 +7,9 @@
 
 typedef struct hash_node {
     char *text;
-    int token;
+    int token_type;             //token or symbol type
     struct hash_node *next;
-	struct node* decl;
+	struct ast_node* decl;
 } HASH_NODE;
 
 HASH_NODE *table[HASH_SIZE];

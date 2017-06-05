@@ -21,6 +21,7 @@ int main(int argc, char *argv[]) {
     yyin = fopen(argv[1], "r");
     if (!yyin) {
         printf("Não foi possível abrir o arquivo.\n");
+        exit(2);
     }
 
 	while(isRunning())	//not sure about this line
