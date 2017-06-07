@@ -4,6 +4,21 @@
 #include "y.tab.h"
 #include "hash.h"
 
+int semanticError = 0;
+
+void semanticVerifications(AST *ast_node){
+    
+    semanticError = 0;
+    
+    semanticSetDeclarations(ast_node);
+    checkUndeclared();
+    
+    
+    if(semanticError){
+        exit(4);
+    }
+}
+
 void semanticSetDeclarations(AST *ast_node){
     int i=0;
     
@@ -20,7 +35,7 @@ void semanticSetDeclarations(AST *ast_node){
         if(ast_node->symbol->token_type != TK_IDENTIFIER)
         {
             fprintf(stdout, "Semantic Error: variable, vector or function \"%s\" already declared.\n", ast_node->symbol->text);
-            exit(4);
+            semanticError = 1;
         }
         
         switch(ast_node->node_type)
@@ -66,16 +81,12 @@ void semanticSetDeclarations(AST *ast_node){
  
 int checkUndeclared(void) //search for TK_IDENTIFIER on hash
 {
-    int semanticError = 0;
+
     HASH_NODE *undecl_symbol;
     
     while(undecl_symbol = hash_search_type(TK_IDENTIFIER))
     {
         fprintf(stdout, "Semantic Error: variable, vector or function \"%s\" undefined.\n", undecl_symbol->text);
         semanticError = 1;
-    }
-    
-    if(semanticError){
-        exit(4);
     }
 }

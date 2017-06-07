@@ -6,7 +6,6 @@
 #define DATATYPE_LONG       4
 #define DATATYPE_SHORT      5
 
-
+void semanticVerifications(AST *ast_node);
 void semanticSetDeclarations(AST *ast_node);
- 
 int checkUndeclared(void);
