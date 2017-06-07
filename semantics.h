@@ -13,3 +13,4 @@ int checkUndeclared(void);
 void assertProperUse(AST *ast_node);
 int compatibleAssignTypes(int type1, int type2);
 int assertExpTypeAddSub(int type1, int type2);
+int checkExpValidity(AST *node);

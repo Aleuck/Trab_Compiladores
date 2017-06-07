@@ -28,7 +28,7 @@ hash.o: hash.c hash.h
 ast.o: ast.c ast.h
 	gcc -c ast.c
 clean:
-	rm *.o *.stackdump lex.yy.c lex.yy.h y.tab.h y.tab.c etapa4 y.output
+	rm *.o lex.yy.c lex.yy.h y.tab.h y.tab.c etapa4 y.output
 love:
 	make clean
 	make
