@@ -6,13 +6,13 @@
 
 int semanticError = 0;
 
-void semanticVerifications(AST *ast_node){
+void semanticVerifications(AST *ast_root){
     
     semanticError = 0;
     
-    semanticSetDeclarations(ast_node);
+    semanticSetDeclarations(ast_root);
     checkUndeclared();
-    
+    assertProperUse(ast_root);
     
     if(semanticError){
         exit(4);
@@ -30,11 +30,11 @@ void semanticSetDeclarations(AST *ast_node){
 
         if(!ast_node->symbol)
         {
-            fprintf(stdout, "árvore bugada");
+            fprintf(stderr, "árvore bugada");
         }
         if(ast_node->symbol->token_type != TK_IDENTIFIER)
         {
-            fprintf(stdout, "Semantic Error: variable, vector or function \"%s\" already declared.\n", ast_node->symbol->text);
+            fprintf(stderr, "Semantic Error: variable, vector or function \"%s\" already declared.\n", ast_node->symbol->text);
             semanticError = 1;
         }
         
@@ -42,19 +42,19 @@ void semanticSetDeclarations(AST *ast_node){
         {
             case AST_VAR_DECL:
                     ast_node->symbol->token_type = SYMBOL_VAR;
-                    fprintf(stdout, "decl var: %s\n", ast_node->symbol->text);
+                    fprintf(stderr, "decl var: %s\n", ast_node->symbol->text);
                     break;
             case AST_function_decl:
                     ast_node->symbol->token_type = SYMBOL_FUNC;
-                    fprintf(stdout, "decl func: %s\n", ast_node->symbol->text);
+                    fprintf(stderr, "decl func: %s\n", ast_node->symbol->text);
                     break;
             case AST_VECTOR_DECL:
                     ast_node->symbol->token_type = SYMBOL_VECTOR;
-                    fprintf(stdout, "decl vec: %s\n", ast_node->symbol->text);
+                    fprintf(stderr, "decl vec: %s\n", ast_node->symbol->text);
                     break;
             case AST_DECL_PARAMLIST:
                     ast_node->symbol->token_type = SYMBOL_LOCAL_VAR;
-                    fprintf(stdout, "decl vec: %s\n", ast_node->symbol->text);
+                    fprintf(stderr, "decl vec: %s\n", ast_node->symbol->text);
                     break;
         }
 
@@ -67,7 +67,7 @@ void semanticSetDeclarations(AST *ast_node){
             case AST_FLOAT       :   ast_node->data_type = DATATYPE_FLOAT ; break;
             case AST_LONG        :   ast_node->data_type = DATATYPE_LONG  ; break;
             case AST_SHORT       :   ast_node->data_type = DATATYPE_SHORT; break;
-            default              :   fprintf(stdout, "árvore bugada");
+            default              :   fprintf(stderr, "árvore bugada");
         }
         
         i=1;
@@ -86,7 +86,132 @@ int checkUndeclared(void) //search for TK_IDENTIFIER on hash
     
     while(undecl_symbol = hash_search_type(TK_IDENTIFIER))
     {
-        fprintf(stdout, "Semantic Error: variable, vector or function \"%s\" undefined.\n", undecl_symbol->text);
+        fprintf(stderr, "Semantic Error: variable, vector or function \"%s\" undefined.\n", undecl_symbol->text);
         semanticError = 1;
     }
+}
+
+void assertProperUse(AST *ast_node){
+    int i;
+    
+    if(!ast_node)
+        return ;
+    
+    for(i=0; i<MAX_CHILDREN; i++)               //run for children first
+        assertProperUse(ast_node->son[i]);
+    
+    switch(ast_node->node_type){
+        case AST_VAR_ASSIGN:
+                if(ast_node->symbol->token_type != SYMBOL_LOCAL_VAR && ast_node->symbol->token_type != SYMBOL_VAR)
+                {
+                    fprintf(stderr, "Semantic Error: \"%s\" not a valid symbol - var assign.\n", ast_node->symbol->text);
+                    semanticError = 1;
+                }
+                
+                if(!compatibleAssignTypes(ast_node->symbol->decl->data_type, ast_node->son[0]->data_type))
+                {
+                    fprintf(stderr, "Semantic Error: not a valid expression on \"%s\" var assign.\n", ast_node->symbol->text);
+                    semanticError = 1;
+                }
+                break;
+
+//        case AST_SUM:
+//                assertExpTypeAddSub();
+//                if()
+      
+    }
+}
+
+int compatibleAssignTypes(int type1, int type2){
+
+    switch(type1){
+        case DATATYPE_SHORT:
+            if(type2 == DATATYPE_SHORT)
+                return 1;
+            break;
+            
+        case DATATYPE_BYTE:
+            if(type2 == DATATYPE_SHORT)
+                return 1;
+            if(type2 == DATATYPE_BYTE)
+                return 1;
+            break;
+ 
+        case DATATYPE_LONG:
+            if(type2 == DATATYPE_SHORT)
+                return 1;
+            if(type2 == DATATYPE_BYTE)
+                return 1;
+            if(type2 == DATATYPE_LONG)
+                return 1;
+            break;
+
+        case DATATYPE_FLOAT:
+            if(type2 == DATATYPE_SHORT)
+                return 1;
+            if(type2 == DATATYPE_BYTE)
+                return 1;
+            if(type2 == DATATYPE_LONG)
+                return 1;
+            if(type2 == DATATYPE_FLOAT)
+                return 1;
+            break;
+            
+        case DATATYPE_DOUBLE:
+            if(type2 == DATATYPE_SHORT)
+                return 1;
+            if(type2 == DATATYPE_BYTE)
+                return 1;
+            if(type2 == DATATYPE_LONG)
+                return 1;
+            if(type2 == DATATYPE_FLOAT)
+                return 1;
+            if(type2 == DATATYPE_FLOAT)
+                return 1;
+            break;
+    }
+
+    return 0;
+}
+
+int assertExpTypeAddSub(int type1, int type2){
+    
+    if(type1 == DATATYPE_bool || type2 == DATATYPE_bool)
+        return 0;
+    
+    if(type1 == DATATYPE_BYTE && type2 == DATATYPE_BYTE)
+        return DATATYPE_BYTE;
+    if(type1 == DATATYPE_FLOAT && type2 == DATATYPE_FLOAT)
+        return DATATYPE_FLOAT;
+    if(type1 == DATATYPE_DOUBLE && type2 == DATATYPE_DOUBLE)
+        return DATATYPE_DOUBLE;
+    if(type1 == DATATYPE_SHORT && type2 == DATATYPE_SHORT)
+        return DATATYPE_SHORT;
+    if(type1 == DATATYPE_LONG && type2 == DATATYPE_LONG)
+        return DATATYPE_LONG;
+    
+    if(type1 == DATATYPE_SHORT && type2 == DATATYPE_LONG || type2 == DATATYPE_SHORT && type1 == DATATYPE_LONG)
+        return DATATYPE_LONG;
+    if(type1 == DATATYPE_SHORT && type2 == DATATYPE_BYTE || type2 == DATATYPE_SHORT && type1 == DATATYPE_BYTE)
+        return DATATYPE_BYTE;
+    if(type1 == DATATYPE_SHORT && type2 == DATATYPE_FLOAT || type2 == DATATYPE_SHORT && type1 == DATATYPE_FLOAT)
+        return DATATYPE_FLOAT;
+    if(type1 == DATATYPE_SHORT && type2 == DATATYPE_DOUBLE || type2 == DATATYPE_SHORT && type1 == DATATYPE_DOUBLE)
+        return DATATYPE_DOUBLE;
+
+    if(type1 == DATATYPE_BYTE && type2 == DATATYPE_LONG || type2 == DATATYPE_BYTE && type1 == DATATYPE_LONG)
+        return DATATYPE_LONG;
+    if(type1 == DATATYPE_BYTE && type2 == DATATYPE_FLOAT || type2 == DATATYPE_BYTE && type1 == DATATYPE_FLOAT)
+        return DATATYPE_FLOAT;
+    if(type1 == DATATYPE_BYTE && type2 == DATATYPE_DOUBLE || type2 == DATATYPE_BYTE && type1 == DATATYPE_DOUBLE)
+        return DATATYPE_DOUBLE;
+
+    if(type1 == DATATYPE_LONG && type2 == DATATYPE_FLOAT || type2 == DATATYPE_LONG && type1 == DATATYPE_FLOAT)
+        return DATATYPE_DOUBLE;
+    if(type1 == DATATYPE_LONG && type2 == DATATYPE_DOUBLE || type2 == DATATYPE_LONG && type1 == DATATYPE_DOUBLE)
+        return DATATYPE_DOUBLE;
+
+    if(type1 == DATATYPE_DOUBLE && type2 == DATATYPE_FLOAT || type2 == DATATYPE_DOUBLE && type1 == DATATYPE_FLOAT)
+        return DATATYPE_DOUBLE;
+    
 }
