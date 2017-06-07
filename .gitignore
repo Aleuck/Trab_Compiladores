@@ -35,6 +35,7 @@ y.output
 
 *.txt
 *.tgz
+*.tar.gz
 
 *.sh
 

@@ -32,3 +32,6 @@ clean:
 love:
 	make clean
 	make
+tgz:
+	make clean
+	tar -czvf etapa4.tar.gz *.c *.h *.yacc *.l makefile  
