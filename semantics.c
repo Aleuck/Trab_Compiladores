@@ -6,6 +6,9 @@
 
 int semanticError = 0;
 
+int astToData(int node_type);
+int compatibleDataTypes (int inst_type, int decl_type);
+
 void semanticVerifications(AST *ast_root){
 
     semanticError = 0;
@@ -60,17 +63,7 @@ void semanticSetDeclarations(AST *ast_node){
         }
 
         ast_node->symbol->decl = ast_node;
-
-        switch(ast_node->son[0]->node_type)
-        {
-            case AST_BYTE        :   ast_node->data_type = DATATYPE_BYTE  ; break;
-            case AST_DOUBLE      :   ast_node->data_type = DATATYPE_DOUBLE; break;
-            case AST_FLOAT       :   ast_node->data_type = DATATYPE_FLOAT ; break;
-            case AST_LONG        :   ast_node->data_type = DATATYPE_LONG  ; break;
-            case AST_SHORT       :   ast_node->data_type = DATATYPE_SHORT; break;
-            default              :   fprintf(stderr, "árvore bugada");
-        }
-
+        ast_node->data_type = astToData(ast_node->son[0]->node_type);
         i=1;
     }
 
@@ -102,6 +95,39 @@ void assertProperUse(AST *ast_node){
         assertProperUse(ast_node->son[i]);
 
     switch(ast_node->node_type){
+        case AST_WHENTHENELSE:
+                if(!checkExpValidityBool(ast_node->son[0]))
+                {
+                  fprintf(stderr, "Semantic Error: not a valid expression on whenthenelse.\n");
+                  semanticError = 1;
+                }
+                break;
+        case AST_WHENTHEN:
+                if(!checkExpValidityBool(ast_node->son[0]))
+                {
+                  fprintf(stderr, "Semantic Error: not a valid expression on whenthen.\n");
+                  semanticError = 1;
+                }
+                break;
+        case AST_WHILE:
+                if(!checkExpValidityBool(ast_node->son[0]))
+                {
+                  fprintf(stderr, "Semantic Error: not a valid expression on while.\n");
+                  semanticError = 1;
+                }
+                break;
+        
+        case AST_FOR:
+                
+                break;
+        
+        case AST_RETURN:
+                if(!checkExpValidityArit(ast_node->son[0]))
+                {
+                  fprintf(stderr, "Semantic Error: not a valid expression on return.\n");
+                  semanticError = 1;
+                }
+                break;
         case AST_VAR_ASSIGN:
                 if(ast_node->symbol->token_type != SYMBOL_LOCAL_VAR && ast_node->symbol->token_type != SYMBOL_VAR)
                 {
@@ -109,7 +135,7 @@ void assertProperUse(AST *ast_node){
                     semanticError = 1;
                 }
 
-                if(!checkExpValidityAssign(ast_node->son[0]))
+                if(!checkExpValidityArit(ast_node->son[0]))
                 {
                   fprintf(stderr, "Semantic Error: not a valid expression on \"%s\" var assign.\n", ast_node->symbol->text);
                   semanticError = 1;
@@ -134,7 +160,7 @@ void assertProperUse(AST *ast_node){
                     semanticError = 1;
                 }
 
-                if(!checkExpValidityAssign(ast_node->son[1]))
+                if(!checkExpValidityArit(ast_node->son[1]))
                 {
                   fprintf(stderr, "Semantic Error: not a valid expression on \"%s\" vector assign.\n", ast_node->symbol->text);
                   semanticError = 1;
@@ -145,13 +171,19 @@ void assertProperUse(AST *ast_node){
 //                  semanticError = 1;
 //                }
                 break;
+                
+        case AST_PARENTHESIS:
+        case AST_LONE_MINUS:
+                ast_node->data_type = ast_node->son[0]->data_type;
+                break;
 
         case AST_SUM:
         case AST_SUBT:
-        case AST_LONE_MINUS:
-                ast_node->data_type = assertExpTypeAddSub(ast_node->son[0]->data_type, ast_node->son[1]->data_type);
+        case AST_MULT:
+        case AST_DIV:
+                ast_node->data_type = assertExpTypeArit(ast_node->son[0]->data_type, ast_node->son[1]->data_type);
                 break;
-                
+               
         case AST_GREATER :
         case AST_LESS    : 
         case AST_LE      :  
@@ -229,8 +261,8 @@ int checkIntExp(AST *node){ //insures exp type is integer
     return 0;
 }
 
-int checkExpValidityAssign(AST *node){
-  if(node && node->son[0]->data_type != 0 && node->son[0]->data_type != DATATYPE_bool)
+int checkExpValidityArit(AST *node){
+  if(node && node->data_type != 0 && node->data_type != DATATYPE_bool)
       return 1;
   return 0;
 }
@@ -255,17 +287,38 @@ int assertExpTypeBool2(int type1, int type2){       //used for ! && ||
     return DATATYPE_bool;
 }
 
-int checkParamlist(AST* ast_node){
-    int paramnum = 0;
-    AST* temp_inst = ast_node;
-    AST* temp_decl = ast_node->symbol->decl;
+void checkParamlist(AST* ast_node){
+    int paramnum=0;
+    AST* temp_inst = ast_node->son[0];
+    AST* temp_decl = ast_node->symbol->decl->son[1];
     
-    while(temp_decl){
+    while(1){
         paramnum++;
+        if(temp_inst && temp_decl){
+            if(!compatibleDataTypes(temp_inst->son[0]->data_type, astToData(temp_decl->son[0]->node_type)))
+            {
+                fprintf(stderr, "Semantic Error: incompatible data types on %d'th last param at \"%s\" function call.\n", paramnum, ast_node->symbol->text);
+                semanticError = 1;
+            }
+            temp_inst = temp_inst->son[1];
+            temp_decl = temp_decl->son[1];
+        }
+        else    //at least one of them is NULL
+        {
+            if(temp_inst == temp_decl)
+                break;                //number of parameters is correct
+            else
+            {
+                fprintf(stderr, "Semantic Error: incompatible param number at \"%s\" function call.\n", ast_node->symbol->text);
+                semanticError = 1;
+                break ;
+            }
+        }
+        
     }
 }
 
-int assertExpTypeAddSub(int type1, int type2){
+int assertExpTypeArit(int type1, int type2){
 
     if(type1 == DATATYPE_bool || type2 == DATATYPE_bool)
         return 0;                                           // datatype error
@@ -305,6 +358,22 @@ int assertExpTypeAddSub(int type1, int type2){
     if((type1 == DATATYPE_DOUBLE && type2 == DATATYPE_FLOAT) || (type2 == DATATYPE_DOUBLE && type1 == DATATYPE_FLOAT))
         return DATATYPE_DOUBLE;
 
+}
+
+int astToData(int node_type){
+    switch(node_type)
+        {
+            case AST_BYTE        :   return DATATYPE_BYTE  ; break;
+            case AST_DOUBLE      :   return DATATYPE_DOUBLE; break;
+            case AST_FLOAT       :   return DATATYPE_FLOAT ; break;
+            case AST_LONG        :   return DATATYPE_LONG  ; break;
+            case AST_SHORT       :   return DATATYPE_SHORT ; break;
+            default              :   fprintf(stderr, "árvore bugada");
+        }
+}
+
+int compatibleDataTypes (int inst_type, int decl_type) {
+    return (inst_type != DATATYPE_bool);
 }
 
 /* especificação pede pra NÃO fazer isso

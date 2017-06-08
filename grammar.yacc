@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "ast.h"
 #include "hash.h"
 #include "semantics.h"
@@ -71,9 +72,9 @@ AST *ast_root;
 %right KW_THEN KW_ELSE
 
 
-%type <ast_node> glob_decl_list glob_decl var_decl cmd_list cmd exp block string_concat paramlist1 paramlist param function_call 
+%type <ast_node> glob_decl_list glob_decl var_decl cmd_list cmd exp block string_concat paramlist1 paramlist function_call 
 flow_ctrl function_decl vector_decl decl_paramlistv decl_paramlist type initial_value initial_values
-initial_values1 vector_size assign whenthen whenthenelse while for simple_string string
+initial_values1 vector_size assign whenthen whenthenelse while for simple_string
 %type <terminal_symbol> TK_IDENTIFIER LIT_INTEGER LIT_REAL LIT_CHAR LIT_STRING
 
 
@@ -185,16 +186,9 @@ paramlist:  paramlist1  {$$ = $1;}
             |           {$$ = NULL;}
             ;
 
-paramlist1: paramlist1 ',' param    {$$ = ast_insert(AST_paramlist, 0, $3, $1, 0, 0);}
-            |param                  {$$ = $1;}
+paramlist1: paramlist1 ',' exp    {$$ = ast_insert(AST_paramlist, 0, $3, $1, 0, 0);}
+            |exp                  {$$ = ast_insert(AST_paramlist, 0, $1, 0, 0, 0);}
             ;
-
-param:      exp                  {$$ = $1;}
-            |string              {$$ = $1;}
-            ;
-
-string: LIT_STRING      {$$ = ast_insert(AST_STRING, $1, 0, 0, 0, 0);}
-        ;
 
 //string concat e simple string servem apenas para o comando print
 string_concat: string_concat simple_string  {$2->son[0] = $1; $$ = $2;}
@@ -316,7 +310,8 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                         uncompile(ast_root->son[0], output);
                                         break;
                                         
-            case AST_function_call      :    fprintf(output,ast_root->symbol->text); 
+                                       
+            case AST_function_call      :    write(output,ast_root->symbol->text,strlen(ast_root->symbol->text)); 
                                                 fprintf(output,"("); 
                                                 uncompile(ast_root->son[0], output);
                                                 fprintf(output,")");
@@ -324,13 +319,13 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
             
             case AST_IDENTIFIER      :
             case AST_LIT_INTEGER     :    
-            case AST_LIT_REAL        :   fprintf(output,ast_root->symbol->text); break;  
+            case AST_LIT_REAL        :   write(output,ast_root->symbol->text,strlen(ast_root->symbol->text)); break;  
             case AST_STRING          :   fprintf(output,"\"");
-                                            fprintf(output,ast_root->symbol->text); 
+                                            write(output,ast_root->symbol->text,strlen(ast_root->symbol->text)); 
                                             fprintf(output,"\"");
                                             break;
             case AST_LIT_CHAR        :   fprintf(output,"'"); 
-                                            fprintf(output,ast_root->symbol->text); 
+                                            write(output,ast_root->symbol->text,strlen(ast_root->symbol->text)); 
                                             fprintf(output,"'");
                                             break;
             case AST_INITIAL_VALUE   :   if(ast_root->son[0]){
@@ -340,14 +335,14 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                           if(ast_root->symbol->token_type == LIT_CHAR)
                                             {
                                                 fprintf(output,"'"); 
-                                                fprintf(output,ast_root->symbol->text); 
+                                                write(output,ast_root->symbol->text,strlen(ast_root->symbol->text)); 
                                                 fprintf(output,"'");
                                             }else{
-                                                fprintf(output,ast_root->symbol->text);
+                                                write(output,ast_root->symbol->text,strlen(ast_root->symbol->text));
                                             }
                                             break;
                                             
-            case AST_VECTOR         :    fprintf(output,ast_root->symbol->text); 
+            case AST_VECTOR         :    write(output,ast_root->symbol->text,strlen(ast_root->symbol->text)); 
                                             fprintf(output,"["); 
                                             uncompile(ast_root->son[0], output);
                                             fprintf(output,"]");
@@ -357,7 +352,7 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                             uncompile(ast_root->son[0], output); 
                                             break; 
             case AST_READ    :   fprintf(output,"read "); 
-                                    fprintf(output,ast_root->symbol->text);
+                                    write(output,ast_root->symbol->text,strlen(ast_root->symbol->text));
                                     break;
             case AST_PRINT   :   fprintf(output,"print "); 
                                     uncompile(ast_root->son[0], output);
@@ -369,10 +364,10 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                             }
                                             if(ast_root->symbol->token_type == LIT_STRING){
                                                 fprintf(output, "\"");
-                                                fprintf(output,ast_root->symbol->text); 
+                                                write(output,ast_root->symbol->text,strlen(ast_root->symbol->text)); 
                                                 fprintf(output, "\"");
                                             }else{
-                                                fprintf(output,ast_root->symbol->text);
+                                                write(output,ast_root->symbol->text,strlen(ast_root->symbol->text));
                                             }
 
                                             break;
@@ -384,13 +379,13 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                             break; 
             case AST_function_decl   :   uncompile(ast_root->son[0], output);
                                             fprintf(output, " ");
-                                            fprintf(output,ast_root->symbol->text);
+                                            write(output,ast_root->symbol->text,strlen(ast_root->symbol->text));
                                             fprintf(output, "(");
                                             uncompile(ast_root->son[1], output); 
                                             fprintf(output, ") ");
                                             uncompile(ast_root->son[2], output); 
                                             break; 
-            case AST_VAR_DECL        :   fprintf(output,ast_root->symbol->text);
+            case AST_VAR_DECL        :   write(output,ast_root->symbol->text,strlen(ast_root->symbol->text));
                                             fprintf(output, " : ");
                                             uncompile(ast_root->son[0], output);
                                             fprintf(output, " ");
@@ -403,7 +398,7 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
             case AST_LONG        :   fprintf(output,"long"); break;
             case AST_SHORT       :   fprintf(output,"short"); break;
 
-            case AST_VECTOR_DECL     :   fprintf(output,ast_root->symbol->text);
+            case AST_VECTOR_DECL     :   write(output,ast_root->symbol->text,strlen(ast_root->symbol->text));
                                             fprintf(output, " : ");
                                             uncompile(ast_root->son[0], output); 
                                             fprintf(output, " [ ");
@@ -412,11 +407,11 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                             uncompile(ast_root->son[2], output); 
                                             break;
 
-            case AST_VAR_ASSIGN      :   fprintf(output,ast_root->symbol->text);
+            case AST_VAR_ASSIGN      :   write(output,ast_root->symbol->text,strlen(ast_root->symbol->text));
                                             fprintf(output," = ");
                                             uncompile(ast_root->son[0], output);
                                             break;
-            case AST_VECTOR_ASSIGN   :   fprintf(output,ast_root->symbol->text);
+            case AST_VECTOR_ASSIGN   :   write(output,ast_root->symbol->text,strlen(ast_root->symbol->text));
                                             fprintf(output," # ");
                                             uncompile(ast_root->son[0], output);
                                             fprintf(output," = ");
@@ -441,7 +436,7 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                             uncompile(ast_root->son[1], output);
                                             break;
             case AST_FOR             :   fprintf(output,"for (");
-                                            fprintf(output,ast_root->symbol->text);
+                                            write(output,ast_root->symbol->text,strlen(ast_root->symbol->text));
                                             fprintf(output," = ");
                                             uncompile(ast_root->son[0], output);
                                             fprintf(output," to ");
@@ -457,7 +452,7 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                             }
                                             uncompile(ast_root->son[0], output);
                                             fprintf(output, " ");
-                                            fprintf(output,ast_root->symbol->text);
+                                            write(output,ast_root->symbol->text,strlen(ast_root->symbol->text));
                                             break;
             
          }
