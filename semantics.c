@@ -57,19 +57,19 @@ void semanticSetDeclarations(AST *ast_node){
         {
             case AST_VAR_DECL:
                     ast_node->symbol->token_type = SYMBOL_VAR;
-                    fprintf(stderr, "decl var: %s\n", ast_node->symbol->text);
+//                    fprintf(stderr, "decl var: %s\n", ast_node->symbol->text);
                     break;
             case AST_function_decl:
                     ast_node->symbol->token_type = SYMBOL_FUNC;
-                    fprintf(stderr, "decl func: %s\n", ast_node->symbol->text);
+//                    fprintf(stderr, "decl func: %s\n", ast_node->symbol->text);
                     break;
             case AST_VECTOR_DECL:
                     ast_node->symbol->token_type = SYMBOL_VECTOR;
-                    fprintf(stderr, "decl vec: %s\n", ast_node->symbol->text);
+//                    fprintf(stderr, "decl vec: %s\n", ast_node->symbol->text);
                     break;
             case AST_DECL_PARAMLIST:
                     ast_node->symbol->token_type = SYMBOL_LOCAL_VAR;
-                    fprintf(stderr, "decl vec: %s\n", ast_node->symbol->text);
+//                    fprintf(stderr, "decl vec: %s\n", ast_node->symbol->text);
                     break;
         }
 
@@ -109,21 +109,21 @@ void assertProperUse(AST *ast_node){
         case AST_WHENTHENELSE:
                 if(!checkExpValidityBool(ast_node->son[0]))
                 {
-                  fprintf(stderr, "Semantic Error: not a valid expression on whenthenelse.\n");
+                  fprintf(stderr, "Semantic Error - Line %d: not a valid expression on whenthenelse.\n", ast_node->lineNum);
                   semanticError = 1;
                 }
                 break;
         case AST_WHENTHEN:
                 if(!checkExpValidityBool(ast_node->son[0]))
                 {
-                  fprintf(stderr, "Semantic Error: not a valid expression on whenthen.\n");
+                  fprintf(stderr, "Semantic Error - Line %d: not a valid expression on whenthen.\n", ast_node->lineNum);
                   semanticError = 1;
                 }
                 break;
         case AST_WHILE:
                 if(!checkExpValidityBool(ast_node->son[0]))
                 {
-                  fprintf(stderr, "Semantic Error: not a valid expression on while.\n");
+                  fprintf(stderr, "Semantic Error - Line %d: not a valid expression on while.\n", ast_node->lineNum);
                   semanticError = 1;
                 }
                 break;
@@ -131,18 +131,18 @@ void assertProperUse(AST *ast_node){
         case AST_FOR:
                 if(ast_node->symbol->token_type != SYMBOL_LOCAL_VAR && ast_node->symbol->token_type != SYMBOL_VAR)
                 {
-                    fprintf(stderr, "Semantic Error: \"%s\" not a valid symbol - for.\n", ast_node->symbol->text);
+                    fprintf(stderr, "Semantic Error - Line %d: \"%s\" not a valid symbol - for.\n", ast_node->lineNum, ast_node->symbol->text);
                     semanticError = 1;
                 }
                 
                 if(!checkExpValidityArit(ast_node->son[0]))
                 {
-                  fprintf(stderr, "Semantic Error: not a valid begin expression on \"%s\" for command.\n", ast_node->symbol->text);
+                  fprintf(stderr, "Semantic Error - Line %d: not a valid begin expression on \"%s\" for command.\n", ast_node->lineNum, ast_node->symbol->text);
                   semanticError = 1;
                 }
                 if(!checkExpValidityArit(ast_node->son[1]))
                 {
-                  fprintf(stderr, "Semantic Error: not a valid final expression on \"%s\" for command.\n", ast_node->symbol->text);
+                  fprintf(stderr, "Semantic Error - Line %d: not a valid final expression on \"%s\" for command.\n", ast_node->lineNum, ast_node->symbol->text);
                   semanticError = 1;
                 }
                 break;
@@ -150,20 +150,20 @@ void assertProperUse(AST *ast_node){
         case AST_RETURN:
                 if(!checkExpValidityArit(ast_node->son[0]))
                 {
-                  fprintf(stderr, "Semantic Error: not a valid expression on return.\n");
+                  fprintf(stderr, "Semantic Error - Line %d: not a valid expression on return.\n", ast_node->lineNum);
                   semanticError = 1;
                 }
                 break;
         case AST_VAR_ASSIGN:
                 if(ast_node->symbol->token_type != SYMBOL_LOCAL_VAR && ast_node->symbol->token_type != SYMBOL_VAR)
                 {
-                    fprintf(stderr, "Semantic Error: \"%s\" not a valid symbol - var assign.\n", ast_node->symbol->text);
+                    fprintf(stderr, "Semantic Error - Line %d: \"%s\" not a valid symbol - var assign.\n", ast_node->lineNum, ast_node->symbol->text);
                     semanticError = 1;
                 }
 
                 if(!checkExpValidityArit(ast_node->son[0]))
                 {
-                  fprintf(stderr, "Semantic Error: not a valid expression on \"%s\" var assign.\n", ast_node->symbol->text);
+                  fprintf(stderr, "Semantic Error - Line %d: not a valid expression on \"%s\" var assign.\n", ast_node->lineNum, ast_node->symbol->text);
                   semanticError = 1;
                 }
 //                else if(!compatibleAssignTypes(ast_node->symbol->decl->data_type, ast_node->son[0]->data_type))
@@ -176,19 +176,19 @@ void assertProperUse(AST *ast_node){
         case AST_VECTOR_ASSIGN:
                 if(ast_node->symbol->token_type != SYMBOL_VECTOR)
                 {
-                    fprintf(stderr, "Semantic Error: \"%s\" not a valid symbol - vector assign.\n", ast_node->symbol->text);
+                    fprintf(stderr, "Semantic Error - Line %d: \"%s\" not a valid symbol - vector assign.\n", ast_node->lineNum, ast_node->symbol->text);
                     semanticError = 1;
                 }
                 
                 if(!checkIntExp(ast_node->son[0]))  //index should be int
                 {
-                    fprintf(stderr, "Semantic Error: not a valid index on \"%s\" vector assign.\n", ast_node->symbol->text);
+                    fprintf(stderr, "Semantic Error - Line %d: not a valid index on \"%s\" vector assign.\n", ast_node->lineNum, ast_node->symbol->text);
                     semanticError = 1;
                 }
 
                 if(!checkExpValidityArit(ast_node->son[1]))
                 {
-                  fprintf(stderr, "Semantic Error: not a valid expression on \"%s\" vector assign.\n", ast_node->symbol->text);
+                  fprintf(stderr, "Semantic Error - Line %d: not a valid expression on \"%s\" vector assign.\n", ast_node->lineNum, ast_node->symbol->text);
                   semanticError = 1;
                 }
 //                else if(!compatibleAssignTypes(ast_node->symbol->decl->data_type, ast_node->son[0]->data_type))
@@ -229,7 +229,7 @@ void assertProperUse(AST *ast_node){
         case AST_VECTOR:
                 if(ast_node->symbol->token_type != SYMBOL_VECTOR)
                 {
-                    fprintf(stderr, "Semantic Error: \"%s\" not a valid symbol - vector on exp.\n", ast_node->symbol->text);
+                    fprintf(stderr, "Semantic Error - Line %d: \"%s\" not a valid symbol - vector on exp.\n", ast_node->lineNum, ast_node->symbol->text);
                     semanticError = 1;
                 }
                 else
@@ -239,7 +239,7 @@ void assertProperUse(AST *ast_node){
                 
                 if(!checkIntExp(ast_node->son[0]))  //index should be int
                 {
-                    fprintf(stderr, "Semantic Error: not a valid index on \"%s\" vector on exp.\n", ast_node->symbol->text);
+                    fprintf(stderr, "Semantic Error - Line %d: not a valid index on \"%s\" vector on exp.\n", ast_node->lineNum, ast_node->symbol->text);
                     semanticError = 1;
                 }
                 break;
@@ -247,7 +247,7 @@ void assertProperUse(AST *ast_node){
         case AST_IDENTIFIER:
                 if(ast_node->symbol->token_type != SYMBOL_LOCAL_VAR && ast_node->symbol->token_type != SYMBOL_VAR)
                 {
-                    fprintf(stderr, "Semantic Error: \"%s\" not a valid symbol - var on exp.\n", ast_node->symbol->text);
+                    fprintf(stderr, "Semantic Error - Line %d: \"%s\" not a valid symbol - var on exp.\n", ast_node->lineNum, ast_node->symbol->text);
                     semanticError = 1;
                 }
                 else
@@ -266,7 +266,7 @@ void assertProperUse(AST *ast_node){
         case AST_function_call:
                 if(ast_node->symbol->token_type != SYMBOL_FUNC)
                 {
-                    fprintf(stderr, "Semantic Error: \"%s\" not a valid symbol - function call.\n", ast_node->symbol->text);
+                    fprintf(stderr, "Semantic Error- Line %d: \"%s\" not a valid symbol - function call.\n", ast_node->lineNum, ast_node->symbol->text);
                     semanticError = 1;
                 }
                 else
@@ -323,7 +323,8 @@ void checkParamlist(AST* ast_node){
         if(temp_inst && temp_decl){
             if(!compatibleDataTypes(temp_inst->son[0]->data_type, astToData(temp_decl->son[0]->node_type)))
             {
-                fprintf(stderr, "Semantic Error: incompatible data types on %d'th last param at \"%s\" function call.\n", paramnum, ast_node->symbol->text);
+                fprintf(stderr, "Semantic Error - Line %d: incompatible data types on %d'th last param at \"%s\" function call.\n - - - Declaration at line: %d.\n",
+                                                ast_node->lineNum, paramnum, ast_node->symbol->text, ast_node->symbol->decl->lineNum);
                 semanticError = 1;
             }
             temp_inst = temp_inst->son[1];
@@ -335,7 +336,7 @@ void checkParamlist(AST* ast_node){
                 break;                //number of parameters is correct
             else
             {
-                fprintf(stderr, "Semantic Error: incompatible param number at \"%s\" function call.\n", ast_node->symbol->text);
+                fprintf(stderr, "Semantic Error - Line %d: incompatible param number at \"%s\" function call.\n", ast_node->lineNum, ast_node->symbol->text);
                 semanticError = 1;
                 break ;
             }

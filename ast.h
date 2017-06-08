@@ -57,6 +57,7 @@ typedef struct hash_node HASH_NODE;
 typedef struct ast_node{
     int node_type;
 	int data_type;
+    int lineNum;
 
     struct ast_node *son[MAX_CHILDREN];
     HASH_NODE *symbol;

@@ -53,6 +53,8 @@ AST *ast_insert(int node_type, HASH_NODE *symbol, AST *son0, AST *son1, AST *son
     newnode->son[2] = son2;
     newnode->son[3] = son3;
     
+    newnode->lineNum = getLineNumber();
+    
     return newnode;
 }
 
