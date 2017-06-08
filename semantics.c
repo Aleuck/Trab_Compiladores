@@ -129,7 +129,22 @@ void assertProperUse(AST *ast_node){
                 break;
         
         case AST_FOR:
+                if(ast_node->symbol->token_type != SYMBOL_LOCAL_VAR && ast_node->symbol->token_type != SYMBOL_VAR)
+                {
+                    fprintf(stderr, "Semantic Error: \"%s\" not a valid symbol - for.\n", ast_node->symbol->text);
+                    semanticError = 1;
+                }
                 
+                if(!checkExpValidityArit(ast_node->son[0]))
+                {
+                  fprintf(stderr, "Semantic Error: not a valid begin expression on \"%s\" for command.\n", ast_node->symbol->text);
+                  semanticError = 1;
+                }
+                if(!checkExpValidityArit(ast_node->son[1]))
+                {
+                  fprintf(stderr, "Semantic Error: not a valid final expression on \"%s\" for command.\n", ast_node->symbol->text);
+                  semanticError = 1;
+                }
                 break;
         
         case AST_RETURN:
