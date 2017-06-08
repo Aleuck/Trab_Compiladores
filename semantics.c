@@ -199,8 +199,24 @@ void assertProperUse(AST *ast_node){
                 break;
         
         case AST_LIT_INTEGER:
-        case AST_LIT_REAL:
         case AST_LIT_CHAR:
+                ast_node->data_type = DATATYPE_BYTE;
+                break;
+        case AST_LIT_REAL:
+                ast_node->data_type = DATATYPE_FLOAT;
+                break;
+        case AST_function_call:
+                if(ast_node->symbol->token_type != SYMBOL_FUNC)
+                {
+                    fprintf(stderr, "Semantic Error: \"%s\" not a valid symbol - function call.\n", ast_node->symbol->text);
+                    semanticError = 1;
+                }
+                else
+                {
+                    ast_node->data_type = ast_node->symbol->decl->data_type;        //inherits data_type from declaration
+                    checkParamlist(ast_node);
+                }
+                
                 break;
     }
 }
@@ -237,6 +253,16 @@ int assertExpTypeBool2(int type1, int type2){       //used for ! && ||
         return 0;                                           // datatype error
 
     return DATATYPE_bool;
+}
+
+int checkParamlist(AST* ast_node){
+    int paramnum = 0;
+    AST* temp_inst = ast_node;
+    AST* temp_decl = ast_node->symbol->decl;
+    
+    while(temp_decl){
+        paramnum++;
+    }
 }
 
 int assertExpTypeAddSub(int type1, int type2){

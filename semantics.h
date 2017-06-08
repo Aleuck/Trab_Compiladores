@@ -18,3 +18,4 @@ int assertExpTypeBool2(int type1, int type2);
 int checkExpValidityAssign(AST *node);
 int checkExpValidityBool(AST *node);
 int checkIntExp(AST *node);
+int checkParamlist(AST* ast_node);
