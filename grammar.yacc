@@ -64,11 +64,11 @@ AST *ast_root;
 //precedências:
 
 %left OPERATOR_OR
-%left OPERATOR_AND
+%left OPERATOR_AND '!'
 %left '>' '<' OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_NE
 %left '-' '+'
 %left '*' '/'
-%left '!' LONE_MINUS 
+%left LONE_MINUS 
 %right KW_THEN KW_ELSE
 
 
