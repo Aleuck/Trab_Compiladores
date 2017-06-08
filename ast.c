@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "ast.h"
 
+int getLineNumber(void);
+
 AST *ast_create_node(int node_type){
     AST *node_pointer;
     int i;
