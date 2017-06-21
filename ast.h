@@ -11,11 +11,11 @@
 #define AST_DIV              6
 #define AST_GREATER          7
 #define AST_LESS             8
-#define AST_LE               9 
-#define AST_GE               10 
-#define AST_EQ               11 
-#define AST_NE               12 
-#define AST_AND              13 
+#define AST_LE               9
+#define AST_GE               10
+#define AST_EQ               11
+#define AST_NE               12
+#define AST_AND              13
 #define AST_OR               14
 #define AST_LONE_MINUS       15
 #define AST_NOT              16
@@ -28,8 +28,7 @@
 #define AST_LIT_REAL         23
 #define AST_LIT_INTEGER      24
 #define AST_VECTOR           25
-#define AST_STRING           26
-#define AST_paramlist        27
+#define AST_PARAMLIST        27
 #define AST_READ             28
 #define AST_PRINT            29
 #define AST_STRINGCONCAT     30
@@ -47,11 +46,11 @@
 #define AST_VECTOR_ASSIGN    43
 
 #define AST_WHENTHEN         44
-#define AST_WHENTHENELSE     45  
+#define AST_WHENTHENELSE     45
 #define AST_WHILE            46
-#define AST_FOR              47  
+#define AST_FOR              47
 #define AST_DECL_PARAMLIST   48
-             
+
 typedef struct hash_node HASH_NODE;
 
 typedef struct ast_node{

@@ -189,8 +189,8 @@ paramlist:  paramlist1  {$$ = $1;}
             |           {$$ = NULL;}
             ;
 
-paramlist1: paramlist1 ',' exp    {$$ = ast_insert(AST_paramlist, 0, $3, $1, 0, 0);}
-            |exp                  {$$ = ast_insert(AST_paramlist, 0, $1, 0, 0, 0);}
+paramlist1: paramlist1 ',' exp    {$$ = ast_insert(AST_PARAMLIST, 0, $3, $1, 0, 0);}
+            |exp                  {$$ = ast_insert(AST_PARAMLIST, 0, $1, 0, 0, 0);}
             ;
 
 //string concat e simple string servem apenas para o comando print
@@ -350,7 +350,7 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                             uncompile(ast_root->son[0], output);
                                             fprintf(output,"]");
                                             break;
-            case AST_paramlist      :    uncompile(ast_root->son[1], output);
+            case AST_PARAMLIST      :    uncompile(ast_root->son[1], output);
                                             fprintf(output, ", ");
                                             uncompile(ast_root->son[0], output); 
                                             break; 

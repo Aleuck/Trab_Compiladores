@@ -7,18 +7,18 @@ int getLineNumber(void);
 AST *ast_create_node(int node_type){
     AST *node_pointer;
     int i;
-    
+
     node_pointer = (AST *) malloc(sizeof(AST));
-    
+
     if(!node_pointer)
         return NULL;
-    
+
     for(i=0; i<MAX_CHILDREN; i++){
         node_pointer->son[i] = NULL;
     }
     node_pointer->symbol = NULL;
     node_pointer->node_type = node_type;
-    
+
     return node_pointer;
 }
 
@@ -42,21 +42,21 @@ int ast_add_son(AST *father, AST *son){
 
 AST *ast_insert(int node_type, HASH_NODE *symbol, AST *son0, AST *son1, AST *son2, AST *son3){
     AST *newnode;
-    
+
     newnode = ast_create_node(node_type);
     if(!newnode){
         fprintf(stderr, "error: insert - newnode\n");
         return 0;}
 
     newnode->symbol = symbol;
-    
+
     newnode->son[0] = son0;
     newnode->son[1] = son1;
     newnode->son[2] = son2;
     newnode->son[3] = son3;
-    
+
     newnode->lineNum = getLineNumber();
-    
+
     return newnode;
 }
 
@@ -67,9 +67,9 @@ void ast_print(int level, AST *root){
     if(root){
         for(i=0 ; i<level; i++)
             fprintf(stderr,"    ");
-        
+
         ast_print_node(root);
-        
+
         for(i=0; i<MAX_CHILDREN; i++)
         {
             if(root->son[i])
@@ -83,8 +83,8 @@ void ast_print_node(AST *node){ //incomplete
 
     if(node){
         switch(node->node_type){
-            
-            case AST_CMD     :   fprintf(stderr,"CMD"); break; 
+
+            case AST_CMD     :   fprintf(stderr,"CMD"); break;
             case AST_SUM     :   fprintf(stderr,"SUM"); break;
             case AST_SUBT    :   fprintf(stderr,"SUBT"); break;
             case AST_MULT    :   fprintf(stderr,"MULT"); break;
@@ -109,7 +109,7 @@ void ast_print_node(AST *node){ //incomplete
             case AST_LIT_CHAR       :   fprintf(stderr,"CHAR"); break;
             case AST_VECTOR      :   fprintf(stderr,"VECTOR"); break;
             case AST_STRING     :   fprintf(stderr,"STRING"); break;
-            case AST_paramlist      :   fprintf(stderr,"paramlist"); break;
+            case AST_PARAMLIST      :   fprintf(stderr,"paramlist"); break;
             case AST_READ    :   fprintf(stderr,"READ"); break;
             case AST_PRINT   :   fprintf(stderr,"PRINT"); break;
             case AST_STRINGCONCAT      :   fprintf(stderr,"STRINGCONCAT"); break;
@@ -130,9 +130,9 @@ void ast_print_node(AST *node){ //incomplete
             case AST_WHILE            :   fprintf(stderr,"WHILE"); break;
             case AST_FOR              :   fprintf(stderr,"FOR "); break;
             case AST_DECL_PARAMLIST   :   fprintf(stderr,"DECL_PARAMLIST "); break;
-            
+
          }
-            
+
         fprintf(stderr,"\n");
     }
 }

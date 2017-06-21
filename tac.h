@@ -13,8 +13,18 @@
 #define TAC_SYMBOL      7
 #define TAC_ADD         8
 #define TAC_SUB         9
-#define TAC_MULT        10
-#define TAC_DIV         11
+#define TAC_MULT       10
+#define TAC_DIV        11
+#define TAC_GT         12
+#define TAC_LT         13
+#define TAC_LE         14
+#define TAC_GE         15
+#define TAC_EQ         16
+#define TAC_NE         17
+#define TAC_AND        18
+#define TAC_OR         19
+#define TAC_NOT        20
+#define TAC_LMINUS     21
 //tem mais
 
 
@@ -23,7 +33,7 @@ typedef struct tac_struct {
     HASH_NODE* op1;
     HASH_NODE* op2;
     HASH_NODE* res;
-    
+
     struct tac_struct* prev;
     struct tac_struct* next;
 } TAC;
