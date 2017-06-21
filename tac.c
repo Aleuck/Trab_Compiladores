@@ -5,7 +5,63 @@
 void tac_printnode(TAC* node);
 
 TAC* tac_generate(AST* node){
-    //TODO
+    int i=0;
+    TAC* code[MAX_CHILDREN];
+    TAC* result = NULL;
+    
+    if (!node)
+        return NULL;
+    
+    for(i=0; i<MAX_CHILDREN; i++){          //this is a bottom up function
+        tac_generate(node->son[i]);
+    }
+    
+    switch(node->node_type){
+        
+        case AST_CMD            : break;
+        case AST_ASSIGN         : break;
+        case AST_SUM            : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_ADD, makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
+        case AST_SUBT           : break;
+        case AST_MULT           : break;
+        case AST_DIV            : break;
+        case AST_GREATER        : break;
+        case AST_LESS           : break;
+        case AST_LE             : break;
+        case AST_GE             : break;
+        case AST_EQ             : break;
+        case AST_NE             : break;
+        case AST_AND            : break;
+        case AST_OR             : break;
+        case AST_LONE_MINUS     : break;
+        case AST_NOT            : break;
+        case AST_IDENTIFIER     : break;
+        case AST_PARENTHESIS    : break;
+        case AST_BLOCK          : break;
+        case AST_RETURN         : break;
+        case AST_function_call  : break;
+        case AST_LIT_CHAR       : break;
+        case AST_LIT_REAL       : break;
+        case AST_LIT_INTEGER    : break;
+        case AST_VECTOR         : break;
+        case AST_STRING         : break;
+        case AST_paramlist      : break;
+        case AST_READ           : break;
+        case AST_PRINT          : break;
+        case AST_STRINGCONCAT   : break;
+        case AST_GLOB_DECL      : break;
+        case AST_function_decl  : break;
+        case AST_VAR_DECL       : break;
+        case AST_BYTE           : break;
+        case AST_DOUBLE         : break;
+        case AST_FLOAT          : break;
+        case AST_LONG           : break;
+        case AST_SHORT          : break;
+        case AST_INITIAL_VALUE  : break;
+        case AST_VECTOR_DECL    : break;
+        case AST_VAR_ASSIGN     : break;
+        case AST_VECTOR_ASSIGN  : break;
+        default: fprintf(stderr, "tacgenerate bugada\n");
+    }
 }
 
 TAC* tac_create(int type, HASH_NODE* res, HASH_NODE* op1, HASH_NODE* op2){

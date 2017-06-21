@@ -105,7 +105,7 @@ int isRunning(void);
 
 \n  { ++lineNumber; }
 
-. { return TOKEN_ERROR; }
+
 
 %%
 

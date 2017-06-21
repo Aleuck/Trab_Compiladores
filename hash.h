@@ -18,5 +18,6 @@ HASH_NODE* hash_insert(int token, char *text);
 HASH_NODE* hash_search(char *text, int token_type);
 void hash_print(void);
 HASH_NODE* hash_search_type(int token_type_wanted);
+HASH_NODE* makeTemp(void);
 
 #endif
