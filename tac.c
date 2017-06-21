@@ -13,7 +13,7 @@ TAC* tac_generate(AST* node){
         return NULL;
     
     for(i=0; i<MAX_CHILDREN; i++){          //this is a bottom up function
-        tac_generate(node->son[i]);
+        CODE[i] = tac_generate(node->son[i]);
     }
     
     switch(node->node_type){
@@ -21,9 +21,9 @@ TAC* tac_generate(AST* node){
         case AST_CMD            : break;
         case AST_ASSIGN         : break;
         case AST_SUM            : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_ADD, makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
-        case AST_SUBT           : break;
-        case AST_MULT           : break;
-        case AST_DIV            : break;
+        case AST_SUBT           : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_SUB, makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
+        case AST_MULT           : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_MULT, makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
+        case AST_DIV            : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_DIV, makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
         case AST_GREATER        : break;
         case AST_LESS           : break;
         case AST_LE             : break;
@@ -34,14 +34,16 @@ TAC* tac_generate(AST* node){
         case AST_OR             : break;
         case AST_LONE_MINUS     : break;
         case AST_NOT            : break;
-        case AST_IDENTIFIER     : break;
+        
+        case AST_IDENTIFIER     : 
+        case AST_LIT_CHAR       : 
+        case AST_LIT_REAL       : 
+        case AST_LIT_INTEGER    : break;
+        
         case AST_PARENTHESIS    : break;
         case AST_BLOCK          : break;
         case AST_RETURN         : break;
-        case AST_function_call  : break;
-        case AST_LIT_CHAR       : break;
-        case AST_LIT_REAL       : break;
-        case AST_LIT_INTEGER    : break;
+        case AST_function_call  : break; 
         case AST_VECTOR         : break;
         case AST_STRING         : break;
         case AST_paramlist      : break;
