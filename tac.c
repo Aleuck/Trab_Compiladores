@@ -2,13 +2,14 @@
 #include "stdlib.h"
 #include "tac.h"
 #include "hash.h"
-
+int param_num = 0;
 void tac_printnode(TAC* node);
-TAC* makeFunctionCall(AST* node);
+TAC* makeFunctionCall(HASH_NODE* identifier, TAC* param_list);
 TAC* makeWhenThen(TAC* exp, TAC* cmd);
 TAC* makeWhenThenElse(TAC* exp, TAC* cmdThen, TAC* cmdElse);
 TAC* makeWhile(TAC* exp, TAC* cmd);
 TAC* makeFor(HASH_NODE* i, TAC* expInit, TAC* expEnd, TAC* cmd);
+TAC* makeParamList(TAC* exp, TAC* restoParam);
 
 TAC* tac_generate(AST* node){
     int i=0;
@@ -50,14 +51,15 @@ TAC* tac_generate(AST* node){
         case AST_BLOCK          : // fallthrough
         case AST_PARENTHESIS    : result = code[0]; break;
         case AST_RETURN         : result = tac_join(code[0], tac_create(TAC_RETURN, code[0]?code[0]->res:NULL, NULL, NULL)); break;
-        case AST_FUNCTION_CALL  : makeFunctionCall(node); break;
+        case AST_FUNCTION_CALL  : result = makeFunctionCall(node->symbol, code[0]); break;
         case AST_VECTOR         : result = tac_join(code[0], tac_create(TAC_INDEXSYMBOL, makeTemp(), node->symbol, code[0]->res)); break;
-        case AST_PARAMLIST      : break;
+        case AST_PARAMLIST      : result = makeParamList(code[0], code[1]);
         case AST_READ           : result = tac_create(TAC_READ, NULL, node->symbol, NULL); break;
         case AST_PRINT          : result = tac_join(code[0], tac_create(TAC_PRINT, NULL, code[0]->res, NULL)); break;
         case AST_STRINGCONCAT   : result = tac_join(code[0], tac_create(TAC_STRING, node->symbol, code[0]?code[0]->res:NULL, NULL)); break;        // o código da tac string deve procurar pelos próximos stringconcats no OP1
         case AST_GLOB_DECL      : result = tac_join(code[0], code[1]); break;
-        case AST_FUNCTION_DECL  : break;
+        case AST_DECL_PARAMLIST : result = tac_join(code[1],tac_create(TAC_VAR_DECL,node->symbol,code[0]->res,code[1]?code[1]->res:NULL));
+        case AST_FUNCTION_DECL  : result = tac_join(tac_join(tac_create(TAC_BEGINFUNCT,NULL,node->symbol,NULL), code[2]), tac_create(TAC_ENDFUNCT,NULL,NULL,NULL)); break;
         case AST_VAR_DECL       : result = tac_join(tac_create(TAC_VAR_DECL,node->symbol,code[0]->res,NULL),code[1]); break;
         case AST_INITIAL_VALUE  : result = tac_join(code[0], tac_create(TAC_INITIAL_VALUE, node->symbol, code[0]?code[0]->res:NULL, NULL)); break;   // o código da tac DB deve procurar pelos próximos INITIALVALUE no OP1
         case AST_VECTOR_DECL    : result = tac_join(tac_create(TAC_VEC_DECL,node->symbol,code[0]->res,NULL),code[1]);break;
@@ -75,7 +77,6 @@ TAC* tac_generate(AST* node){
         case AST_WHENTHENELSE   : result = makeWhenThenElse(code[0], code[1], code[2]);break;
         case AST_WHILE          : result = makeWhile(code[0], code[1]); break;
         case AST_FOR            : result = makeFor(node->symbol, code[0], code[1], code[2]);break;
-        case AST_DECL_PARAMLIST : result = tac_join(tac_create(TAC_VAR_DECL,node->symbol,code[0]->res,code[1]?code[1]->res:NULL),code[1]); break;
 
         default: fprintf(stderr, "tacgenerate bugada\n");
     }
@@ -195,9 +196,17 @@ void tac_printnode(TAC* node){
     }
      fprintf(stderr, ");\n");
 }
-
-TAC* makeFunctionCall(AST* node) {return NULL;}
-
+TAC* makeParamList(TAC* exp, TAC* restoParam) {
+  exp;
+  param_num += 1;
+  char buf[32];
+  sprintf(buf,"%d",param_num);
+  return tac_join(tac_join(exp,tac_create(TAC_ARG,hash_insert(param_num, buf),exp?exp->res:NULL,NULL)),restoParam);
+}
+TAC* makeFunctionCall(HASH_NODE* identifier, TAC* param_list) {
+  param_num = 0;
+  return tac_join(param_list,tac_create(TAC_FUNC_CALL, makeTemp(), identifier, NULL));  // param_list
+}
 TAC* makeWhenThen(TAC* exp, TAC* cmd) {
     TAC* whenthentac;
     TAC* labeltac;

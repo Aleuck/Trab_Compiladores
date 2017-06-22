@@ -99,17 +99,17 @@ HASH_NODE* hash_search_type(int token_type_wanted){
     HASH_NODE* current;
 
     if(token_type_wanted == last_search_type){
-        table_count = last_search_table_count;           
+        table_count = last_search_table_count;
         current = last_search_current->next;        //continua de onde parou
     }
     else{
         table_count = 0;
         current = table[table_count];
     }
-    
+
     cont = 1;
     while (cont) {
-        if (current == NULL) 
+        if (current == NULL)
         {
             table_count++;
             if(table_count == HASH_SIZE)
@@ -119,11 +119,11 @@ HASH_NODE* hash_search_type(int token_type_wanted){
             else
             {
                 current = table[table_count];
-            } 
-        } 
-        else 
+            }
+        }
+        else
         {
-            if (current->token_type == token_type_wanted) 
+            if (current->token_type == token_type_wanted)
             {
                 last_search_current = current;
                 last_search_table_count = table_count;
@@ -134,27 +134,27 @@ HASH_NODE* hash_search_type(int token_type_wanted){
             }
         }
     }
-    
+
     last_search_current = 0;
     last_search_table_count = 0;
     last_search_type = 0;
-    
+
     return NULL;
 }
 
 HASH_NODE* makeTemp(void){
     static int serialNumber = 0;
     static char buffer[128];
-    
-    sprintf(buffer, ".73mp0r4ry%d\0", serialNumber++);
+
+    sprintf(buffer, ".73mp0r4ry%d", serialNumber++);
     return hash_insert(TEMP_TYPE, buffer);
 }
 
 HASH_NODE *makeLabel(void){
     static int serialNumber = 0;
     static char buffer[128];
-    
-    sprintf(buffer, ".label%d\0", serialNumber++);
-    
+
+    sprintf(buffer, ".label%d", serialNumber++);
+
     return hash_insert(LABEL_TYPE, buffer);
 }
