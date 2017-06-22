@@ -179,15 +179,21 @@ void tac_printnode(TAC* node){
     fprintf(stderr, ", ");
 
     if(node->res){
-        fprintf(stderr, "%s, ", node->res->text);
+        fprintf(stderr, "%s", node->res->text);
+    }else{
+        fprintf(stderr, "NULL");
     }
     if(node->op1){
-        fprintf(stderr, "%s, ", node->op1->text);
+        fprintf(stderr, ", %s", node->op1->text);
+    }else{
+        fprintf(stderr, ", NULL");
     }
     if(node->op2){
-        fprintf(stderr, "%s);\n", node->op2->text);
+        fprintf(stderr, ", %s", node->op2->text);
+    }else{
+        fprintf(stderr, ", NULL");
     }
-
+     fprintf(stderr, ");\n");
 }
 
 TAC* makeFunctionCall(AST* node) {return NULL;}
