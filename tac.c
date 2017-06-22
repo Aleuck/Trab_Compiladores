@@ -76,7 +76,7 @@ TAC* tac_generate(AST* node){
         case AST_WHENTHENELSE   : result = makeWhenThenElse(code[0], code[1], code[2]);break;
         case AST_WHILE          : result = makeWhile(code[0], code[1]); break;
         case AST_FOR            : result = makeFor(node->symbol, code[0], code[1], code[2]);break;
-        case AST_DECL_PARAMLIST : break;
+        case AST_DECL_PARAMLIST : result = tac_join(tac_create(TAC_VAR_DECL,node->symbol,code[0]->res,code[1]->res),code[1]); break;
 
         default: fprintf(stderr, "tacgenerate bugada\n");
     }
@@ -137,17 +137,43 @@ void tac_printnode(TAC* node){
     fprintf(stderr, "TAC(");
 
     switch(node->type){
-        case TAC_BEGINFUNCT : fprintf(stderr, "TAC_BEGINFUNCT"); break;
-        case TAC_ENDFUNCT   : fprintf(stderr, "TAC_ENDFUNCT"); break;
-        case TAC_FUNC_CALL  : fprintf(stderr, "TAC_FUNC_CALL"); break;
-        case TAC_ARG        : fprintf(stderr, "TAC_ARG"); break;
-        case TAC_MOV       : fprintf(stderr, "TAC_MOV"); break;
-        case TAC_IFZ        : fprintf(stderr, "TAC_IFZ"); break;
-        case TAC_SYMBOL     : fprintf(stderr, "TAC_SYMBOL"); break;
-        case TAC_ADD        : fprintf(stderr, "TAC_ADD"); break;
-        case TAC_SUB        : fprintf(stderr, "TAC_SUB"); break;
-        case TAC_MULT       : fprintf(stderr, "TAC_MULT"); break;
-        case TAC_DIV        : fprintf(stderr, "TAC_DIV"); break;
+        case TAC_BEGINFUNCT    : fprintf(stderr, "TAC_BEGINFUNCT"); break;
+        case TAC_ENDFUNCT      : fprintf(stderr, "TAC_ENDFUNCT"); break;
+        case TAC_FUNC_CALL     : fprintf(stderr, "TAC_FUNC_CALL"); break;
+        case TAC_ARG           : fprintf(stderr, "TAC_ARG"); break;
+        case TAC_MOV           : fprintf(stderr, "TAC_MOV"); break;
+        case TAC_IFZ           : fprintf(stderr, "TAC_IFZ"); break;
+        case TAC_SYMBOL        : fprintf(stderr, "TAC_SYMBOL"); break;
+        case TAC_ADD           : fprintf(stderr, "TAC_ADD"); break;
+        case TAC_SUB           : fprintf(stderr, "TAC_SUB"); break;
+        case TAC_MULT          : fprintf(stderr, "TAC_MULT"); break;
+        case TAC_DIV           : fprintf(stderr, "TAC_DIV"); break;
+        case TAC_GT            : fprintf(stderr, "TAC_GT"); break;
+        case TAC_LT            : fprintf(stderr, "TAC_LT"); break;
+        case TAC_LE            : fprintf(stderr, "TAC_LE"); break;
+        case TAC_GE            : fprintf(stderr, "TAC_GE"); break;
+        case TAC_EQ            : fprintf(stderr, "TAC_EQ"); break;
+        case TAC_NE            : fprintf(stderr, "TAC_NE"); break;
+        case TAC_AND           : fprintf(stderr, "TAC_AND"); break;
+        case TAC_OR            : fprintf(stderr, "TAC_OR"); break;
+        case TAC_NOT           : fprintf(stderr, "TAC_NOT"); break;
+        case TAC_LMINUS        : fprintf(stderr, "TAC_LMINUS"); break;
+        case TAC_INDEXMOV      : fprintf(stderr, "TAC_INDEXMOV"); break;
+        case TAC_INDEXSYMBOL   : fprintf(stderr, "TAC_INDEXSYMBOL"); break;
+        case TAC_PRINT         : fprintf(stderr, "TAC_PRINT"); break;
+        case TAC_RETURN        : fprintf(stderr, "TAC_RETURN"); break;
+        case TAC_READ          : fprintf(stderr, "TAC_READ"); break;
+        case TAC_STRING        : fprintf(stderr, "TAC_STRING"); break;
+        case TAC_INITIAL_VALUE : fprintf(stderr, "TAC_INITIAL_VALUE"); break;
+        case TAC_VAR_DECL      : fprintf(stderr, "TAC_VAR_DECL"); break;
+        case TAC_VEC_DECL      : fprintf(stderr, "TAC_VEC_DECL"); break;
+        case TAC_BYTE          : fprintf(stderr, "TAC_BYTE"); break;
+        case TAC_DOUBLE        : fprintf(stderr, "TAC_DOUBLE"); break;
+        case TAC_FLOAT         : fprintf(stderr, "TAC_FLOAT"); break;
+        case TAC_LONG          : fprintf(stderr, "TAC_LONG"); break;
+        case TAC_SHORT         : fprintf(stderr, "TAC_SHORT"); break;
+        case TAC_LABEL         : fprintf(stderr, "TAC_LABEL"); break;
+        case TAC_JMP           : fprintf(stderr, "TAC_JMP"); break;
 
         default: fprintf(stderr, "TAC_UNKNOWN");
     }
@@ -195,19 +221,19 @@ TAC* makeWhenThenElse(TAC* exp, TAC* cmdThen, TAC* cmdElse) {
 }
 
 TAC* makeWhile(TAC* exp, TAC* cmd) {
-  
+
   TAC* whiletac;
   TAC* endwhiletac;
   TAC* loopInitLabeltac, *loopEndLabeltac;
   HASH_NODE *newLabel1, *newLabel2;			//1 init / 2 end
-  
+
     newLabel1 = makeLabel();
     newLabel2 = makeLabel();
     whiletac = tac_create(TAC_IFZ, newLabel2, exp?exp->res:NULL, NULL);
     endwhiletac = tac_create(TAC_JMP, newLabel1, NULL, NULL);
     loopInitLabeltac = tac_create(TAC_LABEL, newLabel1, NULL, NULL);
     loopEndLabeltac = tac_create(TAC_LABEL, newLabel2, NULL, NULL);
-  
+
     return tac_join(tac_join(tac_join(tac_join(tac_join(loopInitLabeltac, exp), whiletac), cmd), endwhiletac), loopEndLabeltac);
 }
 
