@@ -39,7 +39,7 @@ void semanticSetDeclarations(AST *ast_node){
     if (!ast_node)
         return ;
 
-    if(ast_node->node_type == AST_function_decl || ast_node->node_type == AST_VAR_DECL || ast_node->node_type == AST_VECTOR_DECL || ast_node->node_type == AST_DECL_PARAMLIST)
+    if(ast_node->node_type == AST_FUNCTION_DECL || ast_node->node_type == AST_VAR_DECL || ast_node->node_type == AST_VECTOR_DECL || ast_node->node_type == AST_DECL_PARAMLIST)
     {
 
         if(!ast_node->symbol)
@@ -59,7 +59,7 @@ void semanticSetDeclarations(AST *ast_node){
                     ast_node->symbol->token_type = SYMBOL_VAR;
 //                    fprintf(stderr, "decl var: %s\n", ast_node->symbol->text);
                     break;
-            case AST_function_decl:
+            case AST_FUNCTION_DECL:
                     ast_node->symbol->token_type = SYMBOL_FUNC;
 //                    fprintf(stderr, "decl func: %s\n", ast_node->symbol->text);
                     break;
@@ -263,7 +263,7 @@ void assertProperUse(AST *ast_node){
         case AST_LIT_REAL:
                 ast_node->data_type = DATATYPE_FLOAT;
                 break;
-        case AST_function_call:
+        case AST_FUNCTION_CALL:
                 if(ast_node->symbol->token_type != SYMBOL_FUNC)
                 {
                     fprintf(stderr, "Semantic Error- Line %d: \"%s\" not a valid symbol - function call.\n", ast_node->lineNum, ast_node->symbol->text);

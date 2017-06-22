@@ -103,7 +103,7 @@ void ast_print_node(AST *node){ //incomplete
             case AST_PARENTHESIS  :   fprintf(stderr,"PARENTHESIS"); break;
             case AST_BLOCK      :   fprintf(stderr,"BLOCK"); break;
             case AST_RETURN     :   fprintf(stderr,"RETURN"); break;
-            case AST_function_call      :   fprintf(stderr,"function_call"); break;
+            case AST_FUNCTION_CALL      :   fprintf(stderr,"function_call"); break;
             case AST_LIT_INTEGER    :   fprintf(stderr,"LIT_INTEGER"); break;
             case AST_LIT_REAL       :   fprintf(stderr,"REAL"); break;
             case AST_LIT_CHAR       :   fprintf(stderr,"CHAR"); break;
@@ -113,7 +113,7 @@ void ast_print_node(AST *node){ //incomplete
             case AST_PRINT   :   fprintf(stderr,"PRINT"); break;
             case AST_STRINGCONCAT      :   fprintf(stderr,"STRINGCONCAT"); break;
             case AST_GLOB_DECL      :   fprintf(stderr,"GLOB_DECL"); break;
-            case AST_function_decl      :   fprintf(stderr,"function_decl"); break;
+            case AST_FUNCTION_DECL      :   fprintf(stderr,"function_decl"); break;
             case AST_VAR_DECL       :   fprintf(stderr,"VAR_DECL "); break;
             case AST_BYTE       :   fprintf(stderr,"BYTE "); break;
             case AST_DOUBLE     :   fprintf(stderr,"DOUBLE"); break;

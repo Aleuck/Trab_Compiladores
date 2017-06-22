@@ -153,7 +153,7 @@ initial_value:  LIT_CHAR            {$$ = ast_insert(AST_INITIAL_VALUE, $1, 0, 0
                 |LIT_REAL           {$$ = ast_insert(AST_INITIAL_VALUE, $1, 0, 0, 0, 0);}
                 ;
 
-function_decl:  type TK_IDENTIFIER '(' decl_paramlistv ')' cmd  {$$ = ast_insert(AST_function_decl, $2, $1, $4, $6, 0);}
+function_decl:  type TK_IDENTIFIER '(' decl_paramlistv ')' cmd  {$$ = ast_insert(AST_FUNCTION_DECL, $2, $1, $4, $6, 0);}
                 ;
 
 decl_paramlistv:    decl_paramlist      {$$ = $1;}
@@ -186,7 +186,7 @@ while:      KW_WHILE '(' exp ')' cmd        {$$ = ast_insert(AST_WHILE, 0, $3, $
 for:        KW_FOR '(' TK_IDENTIFIER '=' exp KW_TO exp ')' cmd      {$$ = ast_insert(AST_FOR, $3, $5, $7, $9, 0);}
             ;
 
-function_call:  TK_IDENTIFIER '(' paramlist ')'     {$$ = ast_insert(AST_function_call, $1, $3, 0, 0, 0);}
+function_call:  TK_IDENTIFIER '(' paramlist ')'     {$$ = ast_insert(AST_FUNCTION_CALL, $1, $3, 0, 0, 0);}
                 ;
 
 paramlist:  paramlist1  {$$ = $1;}
@@ -318,7 +318,7 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                         break;
                                         
                                        
-            case AST_function_call      :    fputs(ast_root->symbol->text,output); 
+            case AST_FUNCTION_CALL      :    fputs(ast_root->symbol->text,output); 
                                                 fprintf(output,"("); 
                                                 uncompile(ast_root->son[0], output);
                                                 fprintf(output,")");
@@ -381,7 +381,7 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                             uncompile(ast_root->son[0], output); 
                                             fprintf(output,";\n");
                                             break; 
-            case AST_function_decl   :   uncompile(ast_root->son[0], output);
+            case AST_FUNCTION_DECL   :   uncompile(ast_root->son[0], output);
                                             fprintf(output, " ");
                                             fputs(ast_root->symbol->text,output);
                                             fprintf(output, "(");

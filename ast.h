@@ -23,7 +23,7 @@
 #define AST_PARENTHESIS      18
 #define AST_BLOCK            19
 #define AST_RETURN           20
-#define AST_function_call    21
+#define AST_FUNCTION_CALL    21
 #define AST_LIT_CHAR         22
 #define AST_LIT_REAL         23
 #define AST_LIT_INTEGER      24
@@ -33,7 +33,7 @@
 #define AST_PRINT            29
 #define AST_STRINGCONCAT     30
 #define AST_GLOB_DECL        31
-#define AST_function_decl    32
+#define AST_FUNCTION_DECL    32
 #define AST_VAR_DECL         33
 #define AST_BYTE             34
 #define AST_DOUBLE           35
