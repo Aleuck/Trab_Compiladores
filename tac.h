@@ -41,6 +41,7 @@
 #define TAC_SHORT       35
 #define TAC_LABEL       36
 #define TAC_JMP         37
+#define TAC_IFLESS      38
 
 
 

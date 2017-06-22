@@ -152,7 +152,7 @@ HASH_NODE* makeTemp(void){
 
 HASH_NODE *makeLabel(void){
     static int serialNumber = 0;
-    static int buffer[128];
+    static char buffer[128];
     
     sprintf(buffer, ".label%d\0", serialNumber++);
     

@@ -211,4 +211,19 @@ TAC* makeWhile(TAC* exp, TAC* cmd) {
     return tac_join(tac_join(tac_join(tac_join(tac_join(loopInitLabeltac, exp), whiletac), cmd), endwhiletac), loopEndLabeltac);
 }
 
-TAC* makeFor(HASH_NODE* i, TAC* expInit, TAC* expEnd, TAC* cmd) {return NULL;}
+TAC* makeFor(HASH_NODE* i, TAC* expInit, TAC* expEnd, TAC* cmd) {
+    TAC* looptac, *endlooptac, *assigntac;
+    TAC* loopInitLabeltac, *loopEndLabeltac;
+    HASH_NODE *newLabel1, *newLabel2;
+    
+    newLabel1 = makeLabel();
+    newLabel2 = makeLabel();
+    looptac = tac_create(TAC_IFLESS, newLabel2, expEnd?expEnd->res:NULL, i);
+    endlooptac = tac_create(TAC_JMP,  newLabel1, NULL, NULL);
+    loopInitLabeltac = tac_create(TAC_LABEL, newLabel1, NULL, NULL);
+    loopEndLabeltac = tac_create(TAC_LABEL, newLabel2, NULL, NULL);
+    
+    assigntac = tac_join(expInit, tac_create(TAC_MOV, i, expInit?expInit->res:NULL, NULL));
+    
+    return tac_join(tac_join(tac_join(tac_join(tac_join(tac_join(tac_join(expInit,assigntac), loopInitLabeltac), expEnd), looptac), cmd), endlooptac), loopEndLabeltac);
+}
