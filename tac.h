@@ -33,9 +33,15 @@
 #define TAC_STRING      27
 #define TAC_INITIAL_VALUE 28
 #define TAC_VAR_DECL   29
+#define TAC_VEC_DECL    30
+#define TAC_BYTE        31
+#define TAC_DOUBLE      32
+#define TAC_FLOAT       33
+#define TAC_LONG        34
+#define TAC_SHORT       35
+#define TAC_LABEL       36
+#define TAC_JMP         37
 
-
-//tem mais
 
 
 typedef struct tac_struct {

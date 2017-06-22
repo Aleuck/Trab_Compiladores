@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "hash.h"
+#include "y.tab.h"
 
 int last_search_type = 0;
 int last_search_table_count = 0;
@@ -145,7 +146,15 @@ HASH_NODE* makeTemp(void){
     static int serialNumber = 0;
     static char buffer[128];
     
-    sprintf(buffer, "73mp0r4ry%d\0", serialNumber++);
-    return hash_insert(0, buffer);
+    sprintf(buffer, ".73mp0r4ry%d\0", serialNumber++);
+    return hash_insert(TEMP_TYPE, buffer);
 }
 
+HASH_NODE *makeLabel(void){
+    static int serialNumber = 0;
+    static int buffer[128];
+    
+    sprintf(buffer, ".label%d\0", serialNumber++);
+    
+    return hash_insert(LABEL_TYPE, buffer);
+}

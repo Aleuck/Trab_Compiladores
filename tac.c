@@ -1,6 +1,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "tac.h"
+#include "hash.h"
 
 void tac_printnode(TAC* node);
 TAC* makeFunctionCall(AST* node);
@@ -165,6 +166,7 @@ void tac_printnode(TAC* node){
 }
 
 TAC* makeFunctionCall(AST* node) {return NULL;}
+
 TAC* makeWhenThen(TAC* exp, TAC* cmd) {
     TAC* whenthentac;
     TAC* labeltac;
@@ -174,12 +176,13 @@ TAC* makeWhenThen(TAC* exp, TAC* cmd) {
     whenthentac = tac_create(TAC_IFZ, newLabel, exp?exp->res:NULL, 0);
     labeltac = tac_create(TAC_LABEL, newLabel, NULL, NULL);
 
-    return tacjoin(tacjoin(tacjoin(exp, whenthentac), cmd, labeltac));
+    return tac_join(tac_join(tac_join(exp, whenthentac), cmd), labeltac);
 }
+
 TAC* makeWhenThenElse(TAC* exp, TAC* cmdThen, TAC* cmdElse) {
-  TAC* whentac, elsetac;
-  TAC* label1, label2;
-  HASH_NODE* newLabel1, *newLabel2;
+  TAC *whentac, *elsetac;
+  TAC *label1tac, *label2tac;
+  HASH_NODE *newLabel1, *newLabel2;
 
   newLabel1 = makeLabel();
   newLabel2 = makeLabel();
@@ -188,7 +191,24 @@ TAC* makeWhenThenElse(TAC* exp, TAC* cmdThen, TAC* cmdElse) {
   label1tac = tac_create(TAC_LABEL, newLabel1, NULL, NULL);
   label2tac = tac_create(TAC_LABEL, newLabel2, NULL, NULL);
 
-  return tac_join(tac_join(tac_join(tac_join(exp, whentac), cmdThen), label1tac, cmdElse, label2tac)));
+  return tac_join(tac_join(tac_join(tac_join(tac_join(exp, whentac), cmdThen), label1tac), cmdElse), label2tac);
 }
-TAC* makeWhile(TAC* exp, TAC* cmd) {return NULL;}
+
+TAC* makeWhile(TAC* exp, TAC* cmd) {
+  
+  TAC* whiletac;
+  TAC* endwhiletac;
+  TAC* loopInitLabeltac, *loopEndLabeltac;
+  HASH_NODE *newLabel1, *newLabel2;			//1 init / 2 end
+  
+    newLabel1 = makeLabel();
+    newLabel2 = makeLabel();
+    whiletac = tac_create(TAC_IFZ, newLabel2, exp?exp->res:NULL, NULL);
+    endwhiletac = tac_create(TAC_JMP, newLabel1, NULL, NULL);
+    loopInitLabeltac = tac_create(TAC_LABEL, newLabel1, NULL, NULL);
+    loopEndLabeltac = tac_create(TAC_LABEL, newLabel2, NULL, NULL);
+  
+    return tac_join(tac_join(tac_join(tac_join(tac_join(loopInitLabeltac, exp), whiletac), cmd), endwhiletac), loopEndLabeltac);
+}
+
 TAC* makeFor(HASH_NODE* i, TAC* expInit, TAC* expEnd, TAC* cmd) {return NULL;}

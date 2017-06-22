@@ -61,6 +61,9 @@ AST *ast_root;
 %token SYMBOL_LOCAL_VAR
 
 %token TOKEN_ERROR
+%token LABEL_TYPE
+%token TEMP_TYPE
+
 
 //precedências:
 
