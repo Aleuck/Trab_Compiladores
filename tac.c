@@ -27,7 +27,7 @@ TAC* tac_generate(AST* node){
 
     switch(node->node_type){
 
-        case AST_CMD            : break;
+        case AST_CMD            : result = tac_join(code[0], code[1]); break;
         case AST_SUM            : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_ADD,  makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
         case AST_SUBT           : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_SUB,  makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
         case AST_MULT           : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_MULT, makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
@@ -272,18 +272,18 @@ TAC* makeFor(HASH_NODE* i, TAC* expInit, TAC* expEnd, TAC* cmd) {
 TAC* setPointers(TAC* end){
 	TAC *temp, *anotherTemp = NULL;
 	TAC *init;
-	
+
 	if(end->prev == NULL){			//only one tac element
 		end->next = NULL;
 		return end;
 	}
-	
+
 	for(temp = end; temp->prev; temp=temp->prev){
 	     temp->next = anotherTemp;
          anotherTemp = temp;
 	}
 	temp->next = anotherTemp;		//last case
 	init = temp;
-	
+
 	return init;
 }
