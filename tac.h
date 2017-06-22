@@ -60,5 +60,5 @@ TAC* tac_join(TAC* tac1, TAC* tac2);
 TAC* tac_generate(AST* node);
 void tac_printback(TAC* end);
 void tac_print(TAC* first);
-
+TAC* setPointers(TAC* end);
 #endif

@@ -10,6 +10,7 @@ TAC* makeWhenThenElse(TAC* exp, TAC* cmdThen, TAC* cmdElse);
 TAC* makeWhile(TAC* exp, TAC* cmd);
 TAC* makeFor(HASH_NODE* i, TAC* expInit, TAC* expEnd, TAC* cmd);
 
+
 TAC* tac_generate(AST* node){
     int i=0;
     TAC* code[MAX_CHILDREN];
@@ -124,7 +125,7 @@ void tac_printback(TAC* end){
 void tac_print(TAC* first){
     TAC* temp;
 
-    for(temp = first; temp->next; temp = temp->next){
+    for(temp = first; temp; temp = temp->next){
         tac_printnode(temp);
     }
 }
@@ -257,4 +258,23 @@ TAC* makeFor(HASH_NODE* i, TAC* expInit, TAC* expEnd, TAC* cmd) {
     assigntac = tac_join(expInit, tac_create(TAC_MOV, i, expInit?expInit->res:NULL, NULL));
 
     return tac_join(tac_join(tac_join(tac_join(tac_join(tac_join(tac_join(expInit,assigntac), loopInitLabeltac), expEnd), looptac), cmd), endlooptac), loopEndLabeltac);
+}
+
+TAC* setPointers(TAC* end){
+	TAC *temp, *anotherTemp = NULL;
+	TAC *init;
+	
+	if(end->prev == NULL){			//only one tac element
+		end->next = NULL;
+		return end;
+	}
+	
+	for(temp = end; temp->prev; temp=temp->prev){
+	     temp->next = anotherTemp;
+         anotherTemp = temp;
+	}
+	temp->next = anotherTemp;		//last case
+	init = temp;
+	
+	return init;
 }

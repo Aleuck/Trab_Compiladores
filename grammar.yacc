@@ -17,7 +17,8 @@ extern FILE *yyin;
 int yydebug=1;
 
 AST *ast_root = NULL;
-TAC* t = NULL;
+TAC* tEnd = NULL;
+TAC* tBegin = NULL;
 
 %}
 
@@ -90,9 +91,12 @@ initial_values1 vector_size assign whenthen whenthenelse while for simple_string
 program:    glob_decl_list                {ast_root = $1; //ast_print(0, ast_root);
                                             semanticVerifications(ast_root);
                                             //hash_print();
-                                            t = tac_generate(ast_root);
-                                            fprintf(stderr, "t: %x\n", t);
-                                            tac_printback(t);
+                                            tEnd = tac_generate(ast_root);
+                                            tac_printback(tEnd);
+                                            tBegin = setPointers(tEnd);
+                                            fprintf(stderr, "\n\n");
+                                            tac_print(tBegin);
+											
                                           }
             ;
 
