@@ -86,7 +86,8 @@ initial_values1 vector_size assign whenthen whenthenelse while for simple_string
 program:    glob_decl_list                {ast_root = $1; //ast_print(0, ast_root);
                                             semanticVerifications(ast_root);
                                             //hash_print();
-                                            tac_generate(ast_root);
+                                            TAC* t = tac_generate(ast_root);
+                                            tac_print(t);
                                           }
             ;
 
@@ -323,10 +324,7 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
             case AST_IDENTIFIER      :
             case AST_LIT_INTEGER     :    
             case AST_LIT_REAL        :   fputs(ast_root->symbol->text,output); break;  
-            case AST_STRING          :   fprintf(output,"\"");
-                                            fputs(ast_root->symbol->text,output); 
-                                            fprintf(output,"\"");
-                                            break;
+            
             case AST_LIT_CHAR        :   fprintf(output,"'"); 
                                             fputs(ast_root->symbol->text,output); 
                                             fprintf(output,"'");

@@ -8,7 +8,7 @@
 #define TAC_ENDFUNCT    2
 #define TAC_FUNC_CALL   3
 #define TAC_ARG         4
-#define TAC_MOVE        5
+#define TAC_MOV         5
 #define TAC_IFZ         6
 #define TAC_SYMBOL      7
 #define TAC_ADD         8
@@ -25,6 +25,16 @@
 #define TAC_OR         19
 #define TAC_NOT        20
 #define TAC_LMINUS     21
+#define TAC_INDEXMOV   22
+#define TAC_INDEXSYMBOL   23
+#define TAC_PRINT      24
+#define TAC_RETURN     25
+#define TAC_READ       26
+#define TAC_STRING      27
+#define TAC_INITIAL_VALUE 28
+#define TAC_VAR_DECL   29
+
+
 //tem mais
 
 

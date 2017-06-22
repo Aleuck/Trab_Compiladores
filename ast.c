@@ -108,7 +108,6 @@ void ast_print_node(AST *node){ //incomplete
             case AST_LIT_REAL       :   fprintf(stderr,"REAL"); break;
             case AST_LIT_CHAR       :   fprintf(stderr,"CHAR"); break;
             case AST_VECTOR      :   fprintf(stderr,"VECTOR"); break;
-            case AST_STRING     :   fprintf(stderr,"STRING"); break;
             case AST_PARAMLIST      :   fprintf(stderr,"paramlist"); break;
             case AST_READ    :   fprintf(stderr,"READ"); break;
             case AST_PRINT   :   fprintf(stderr,"PRINT"); break;
