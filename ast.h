@@ -4,7 +4,6 @@
 #define MAX_CHILDREN 4
 
 #define AST_CMD              1
-#define AST_ASSIGN           2
 #define AST_SUM              3
 #define AST_SUBT             4
 #define AST_MULT             5

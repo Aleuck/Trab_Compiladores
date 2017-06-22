@@ -26,7 +26,6 @@ TAC* tac_generate(AST* node){
     switch(node->node_type){
 
         case AST_CMD            : break;
-        case AST_ASSIGN         : break;
         case AST_SUM            : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_ADD,  makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
         case AST_SUBT           : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_SUB,  makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
         case AST_MULT           : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_MULT, makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
@@ -174,7 +173,7 @@ void tac_printnode(TAC* node){
         case TAC_SHORT         : fprintf(stderr, "TAC_SHORT"); break;
         case TAC_LABEL         : fprintf(stderr, "TAC_LABEL"); break;
         case TAC_JMP           : fprintf(stderr, "TAC_JMP"); break;
-
+        case TAC_IFLESS        : fprintf(stderr, "TAC_IFLESS"); break;
         default: fprintf(stderr, "TAC_UNKNOWN");
     }
     fprintf(stderr, ", ");
