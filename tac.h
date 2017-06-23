@@ -25,8 +25,8 @@
 #define TAC_OR         19
 #define TAC_NOT        20
 #define TAC_LMINUS     21
-#define TAC_INDEXMOV   22
-#define TAC_INDEXSYMBOL   23
+#define TAC_MOVINDEX   22
+#define TAC_LDINDEX   23
 #define TAC_PRINT      24
 #define TAC_RETURN     25
 #define TAC_READ       26
@@ -42,6 +42,7 @@
 #define TAC_LABEL       36
 #define TAC_JMP         37
 #define TAC_IFLESS      38
+#define TAC_IDtoSTRING  39
 
 
 

@@ -2,6 +2,7 @@
 #include "stdlib.h"
 #include "tac.h"
 #include "hash.h"
+#include "y.tab.h"
 int param_num = 0;
 void tac_printnode(TAC* node);
 TAC* makeFunctionCall(HASH_NODE* identifier, TAC* param_list);
@@ -14,9 +15,9 @@ TAC* makeParamList(TAC* exp, TAC* restoParam);
 
 TAC* tac_generate(AST* node){
     int i=0;
-    TAC* code[MAX_CHILDREN];
-    TAC* result = NULL;
-    TAC* tac_temp;
+    TAC *code[MAX_CHILDREN];
+    TAC *result = NULL, *minhoca;
+    TAC *tac_temp;
 
     if (!node)
         return NULL;
@@ -27,19 +28,19 @@ TAC* tac_generate(AST* node){
 
     switch(node->node_type){
 
-        case AST_CMD            : result = tac_join(code[0], code[1]); break;
+        case AST_CMD            : result = tac_join(code[1], code[0]); break;
         case AST_SUM            : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_ADD,  makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
-        case AST_SUBT           : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_SUB,  makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
+        case AST_SUBT           : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_SUB,  makeTemp(), code[1]?code[1]->res:NULL,code[0]?code[0]->res:NULL))); break;
         case AST_MULT           : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_MULT, makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
-        case AST_DIV            : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_DIV,  makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
-        case AST_GREATER        : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_GT,   makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
-        case AST_LESS           : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_LT,   makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
-        case AST_LE             : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_LE,   makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
-        case AST_GE             : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_GE,   makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
-        case AST_EQ             : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_EQ,   makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
-        case AST_NE             : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_NE,   makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
-        case AST_AND            : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_AND,  makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
-        case AST_OR             : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_OR,   makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL))); break;
+        case AST_DIV            : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_DIV,  makeTemp(), code[1]?code[1]->res:NULL,code[0]?code[0]->res:NULL))); break;
+        case AST_GREATER        : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_GT,   makeTemp(), code[1]?code[1]->res:NULL,code[0]?code[0]->res:NULL))); break;
+        case AST_LESS           : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_LT,   makeTemp(), code[1]?code[1]->res:NULL,code[0]?code[0]->res:NULL))); break;
+        case AST_LE             : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_LE,   makeTemp(), code[1]?code[1]->res:NULL,code[0]?code[0]->res:NULL))); break;
+        case AST_GE             : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_GE,   makeTemp(), code[1]?code[1]->res:NULL,code[0]?code[0]->res:NULL))); break;
+        case AST_EQ             : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_EQ,   makeTemp(), code[1]?code[1]->res:NULL,code[0]?code[0]->res:NULL))); break;
+        case AST_NE             : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_NE,   makeTemp(), code[1]?code[1]->res:NULL,code[0]?code[0]->res:NULL))); break;
+        case AST_AND            : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_AND,  makeTemp(), code[1]?code[1]->res:NULL,code[0]?code[0]->res:NULL))); break;
+        case AST_OR             : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_OR,   makeTemp(), code[1]?code[1]->res:NULL,code[0]?code[0]->res:NULL))); break;
         case AST_NOT            : result = tac_join(code[0], tac_create(TAC_NOT,    makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL)); break;
         case AST_LONE_MINUS     : result = tac_join(code[0], tac_create(TAC_LMINUS, makeTemp(), code[0]?code[0]->res:NULL,code[1]?code[1]->res:NULL)); break;
 
@@ -53,21 +54,28 @@ TAC* tac_generate(AST* node){
         case AST_PARENTHESIS    : result = code[0]; break;
         case AST_RETURN         : result = tac_join(code[0], tac_create(TAC_RETURN, code[0]?code[0]->res:NULL, NULL, NULL)); break;
         case AST_FUNCTION_CALL  : result = makeFunctionCall(node->symbol, code[0]); break;
-        case AST_VECTOR         : result = tac_join(code[0], tac_create(TAC_INDEXSYMBOL, makeTemp(), node->symbol, code[0]->res)); break;
-        case AST_PARAMLIST      : result = makeParamList(code[0], code[1]);
+        case AST_VECTOR         : result = tac_join(code[0], tac_create(TAC_LDINDEX, makeTemp(), node->symbol, code[0]->res)); break;
+        case AST_PARAMLIST      : result = makeParamList(code[0], code[1]);break;
         case AST_READ           : result = tac_create(TAC_READ, NULL, node->symbol, NULL); break;
-        case AST_PRINT          : result = tac_join(code[0], tac_create(TAC_PRINT, NULL, code[0]->res, NULL)); break;
-        case AST_STRINGCONCAT   : result = tac_join(code[0], tac_create(TAC_STRING, node->symbol, code[0]?code[0]->res:NULL, NULL)); break;        // o código da tac string deve procurar pelos próximos stringconcats no OP1
-        case AST_GLOB_DECL      : result = tac_join(code[0], code[1]); break;
+        case AST_PRINT          : result = tac_join(code[0], tac_create(TAC_PRINT, NULL, NULL, NULL)); break;
+        case AST_STRINGCONCAT   : if(node->symbol->token_type == LIT_STRING)
+                                  {
+                                    minhoca = tac_create(TAC_STRING, node->symbol, NULL, NULL);
+                                  }else
+                                  {
+                                    minhoca = tac_create(TAC_IDtoSTRING, node->symbol, NULL, NULL);
+                                  }
+                                  result = tac_join(minhoca,code[0]); break;        // o código da tac string deve procurar pelos próximos stringconcats no OP1
+        case AST_GLOB_DECL      : result = tac_join(code[1], code[0]); break;
         case AST_DECL_PARAMLIST : result = tac_join(code[1],tac_create(TAC_VAR_DECL,node->symbol,code[0]->res,code[1]?code[1]->res:NULL));
         case AST_FUNCTION_DECL  : result = tac_join(tac_join(tac_create(TAC_BEGINFUNCT,NULL,node->symbol,NULL), code[2]), tac_create(TAC_ENDFUNCT,NULL,NULL,NULL)); break;
         case AST_VAR_DECL       : result = tac_join(tac_create(TAC_VAR_DECL,node->symbol,code[0]->res,NULL),code[1]); break;
         case AST_INITIAL_VALUE  : result = tac_join(code[0], tac_create(TAC_INITIAL_VALUE, node->symbol, code[0]?code[0]->res:NULL, NULL)); break;   // o código da tac DB deve procurar pelos próximos INITIALVALUE no OP1
-        case AST_VECTOR_DECL    : result = tac_join(tac_create(TAC_VEC_DECL,node->symbol,code[0]->res,NULL),code[1]);break;
+        case AST_VECTOR_DECL    : result = tac_join(tac_create(TAC_VEC_DECL,node->symbol,code[0]->res, code[1]->res),code[2]);break;
         case AST_VAR_ASSIGN     : result = tac_join(code[0], tac_create(TAC_MOV, node->symbol,code[0]->res, NULL)); break;
 
 
-        case AST_VECTOR_ASSIGN  : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_INDEXMOV, node->symbol, code[0]->res, code[1]->res))); break;
+        case AST_VECTOR_ASSIGN  : result = tac_join(code[0], tac_join(code[1],tac_create(TAC_MOVINDEX, node->symbol, code[0]->res, code[1]->res))); break;
         case AST_BYTE           : result = tac_create(TAC_BYTE, NULL, NULL, NULL);
         case AST_DOUBLE         : result = tac_create(TAC_DOUBLE, NULL, NULL, NULL);
         case AST_FLOAT          : result = tac_create(TAC_FLOAT, NULL, NULL, NULL);
@@ -159,8 +167,8 @@ void tac_printnode(TAC* node){
         case TAC_OR            : fprintf(stderr, "TAC_OR"); break;
         case TAC_NOT           : fprintf(stderr, "TAC_NOT"); break;
         case TAC_LMINUS        : fprintf(stderr, "TAC_LMINUS"); break;
-        case TAC_INDEXMOV      : fprintf(stderr, "TAC_INDEXMOV"); break;
-        case TAC_INDEXSYMBOL   : fprintf(stderr, "TAC_INDEXSYMBOL"); break;
+        case TAC_MOVINDEX      : fprintf(stderr, "TAC_MOVINDEX"); break;
+        case TAC_LDINDEX   : fprintf(stderr, "TAC_LDINDEX"); break;
         case TAC_PRINT         : fprintf(stderr, "TAC_PRINT"); break;
         case TAC_RETURN        : fprintf(stderr, "TAC_RETURN"); break;
         case TAC_READ          : fprintf(stderr, "TAC_READ"); break;
@@ -176,6 +184,7 @@ void tac_printnode(TAC* node){
         case TAC_LABEL         : fprintf(stderr, "TAC_LABEL"); break;
         case TAC_JMP           : fprintf(stderr, "TAC_JMP"); break;
         case TAC_IFLESS        : fprintf(stderr, "TAC_IFLESS"); break;
+        case TAC_IDtoSTRING        : fprintf(stderr, "TAC_IDtoSTRING"); break;
         default: fprintf(stderr, "TAC_UNKNOWN");
     }
     fprintf(stderr, ", ");
@@ -198,11 +207,10 @@ void tac_printnode(TAC* node){
      fprintf(stderr, ");\n");
 }
 TAC* makeParamList(TAC* exp, TAC* restoParam) {
-  exp;
-  param_num += 1;
   char buf[32];
-  sprintf(buf,"%d",param_num);
-  return tac_join(tac_join(exp,tac_create(TAC_ARG,hash_insert(param_num, buf),exp?exp->res:NULL,NULL)),restoParam);
+  param_num += 1;
+  sprintf(buf,".param%d",param_num);
+  return tac_join(tac_join(exp,tac_create(TAC_ARG,hash_insert(PARAM_NUM, buf),exp?exp->res:NULL,NULL)),restoParam);
 }
 TAC* makeFunctionCall(HASH_NODE* identifier, TAC* param_list) {
   param_num = 0;
@@ -232,7 +240,7 @@ TAC* makeWhenThenElse(TAC* exp, TAC* cmdThen, TAC* cmdElse) {
   label1tac = tac_create(TAC_LABEL, newLabel1, NULL, NULL);
   label2tac = tac_create(TAC_LABEL, newLabel2, NULL, NULL);
 
-  return tac_join(tac_join(tac_join(tac_join(tac_join(exp, whentac), cmdThen), label1tac), cmdElse), label2tac);
+  return tac_join(tac_join(tac_join(tac_join(tac_join(tac_join(exp, whentac), cmdThen), elsetac),label1tac), cmdElse), label2tac);
 }
 
 TAC* makeWhile(TAC* exp, TAC* cmd) {
