@@ -274,7 +274,7 @@ TAC* makeFor(HASH_NODE* i, TAC* expInit, TAC* expEnd, TAC* cmd) {
 
     assigntac = tac_join(expInit, tac_create(TAC_MOV, i, expInit?expInit->res:NULL, NULL));
 
-    return tac_join(tac_join(tac_join(tac_join(tac_join(tac_join(tac_join(expInit,assigntac), loopInitLabeltac), expEnd), looptac), cmd), endlooptac), loopEndLabeltac);
+    return tac_join(tac_join(tac_join(tac_join(tac_join(tac_join(assigntac, loopInitLabeltac), expEnd), looptac), cmd), endlooptac), loopEndLabeltac);
 }
 
 TAC* setPointers(TAC* end){
