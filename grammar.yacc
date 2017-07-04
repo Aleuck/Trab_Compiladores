@@ -93,7 +93,7 @@ program:    glob_decl_list                {ast_root = $1; //ast_print(0, ast_roo
                                             semanticVerifications(ast_root);
                                             //hash_print();
                                             tEnd = tac_generate(ast_root);
-                                            tac_printback(tEnd);
+                                            //tac_printback(tEnd);
                                             tBegin = setPointers(tEnd);
                                             fprintf(stderr, "\n\n");
                                             tac_print(tBegin);
