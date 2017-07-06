@@ -57,7 +57,7 @@ TAC* tac_generate(AST* node){
         case AST_VECTOR         : result = tac_join(code[0], tac_create(TAC_LDINDEX, makeTemp(), node->symbol, code[0]->res)); break;
         case AST_PARAMLIST      : result = makeParamList(code[0], code[1]);break;
         case AST_READ           : result = tac_create(TAC_READ, NULL, node->symbol, NULL); break;
-        case AST_PRINT          : result = tac_join(code[0], tac_create(TAC_PRINT, NULL, NULL, NULL)); break;
+        case AST_PRINT          : result = tac_join(tac_create(TAC_PRINT, NULL, NULL, NULL), code[0]); break;
         case AST_STRINGCONCAT   : if(node->symbol->token_type == LIT_STRING)
                                   {
                                     minhoca = tac_create(TAC_STRING, node->symbol, NULL, NULL);
@@ -65,7 +65,7 @@ TAC* tac_generate(AST* node){
                                   {
                                     minhoca = tac_create(TAC_IDtoSTRING, node->symbol, NULL, NULL);
                                   }
-                                  result = tac_join(minhoca,code[0]); break;        // o código da tac string deve procurar pelos próximos stringconcats no OP1
+                                  result = tac_join(code[0], minhoca); break;        // o código da tac string deve procurar pelos próximos stringconcats no OP1
         case AST_GLOB_DECL      : result = tac_join(code[1], code[0]); break;
         case AST_DECL_PARAMLIST : result = tac_join(code[1],tac_create(TAC_VAR_DECL,node->symbol,code[0]->res,code[1]?code[1]->res:NULL));
         case AST_FUNCTION_DECL  : result = tac_join(tac_join(tac_create(TAC_BEGINFUNCT,NULL,node->symbol,NULL), code[2]), tac_create(TAC_ENDFUNCT,NULL,NULL,NULL)); break;
@@ -143,6 +143,10 @@ void tac_printnode(TAC* node){
 
     if(!node)
         return ;
+        
+    if(node->type == TAC_SYMBOL)
+        return ;
+    
     fprintf(stderr, "TAC(");
 
     switch(node->type){
