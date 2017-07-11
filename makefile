@@ -37,3 +37,9 @@ love:
 tgz:
 	make clean
 	tar cvzf etapa5.tgz *.c *.h *.l *.yacc makefile
+comp:
+	make
+	./etapa6 teste.txt out.s
+	gcc -o out out.s
+	printf "\n\n"
+	./out.exe
