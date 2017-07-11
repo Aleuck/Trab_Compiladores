@@ -43,7 +43,8 @@
 #define TAC_JMP         37
 #define TAC_IFLESS      38
 #define TAC_IDtoSTRING  39
-
+#define TAC_TEMP        40
+#define TAC_STR_DECL    41
 
 
 typedef struct tac_struct {
@@ -62,4 +63,6 @@ TAC* tac_generate(AST* node);
 void tac_printback(TAC* end);
 void tac_print(TAC* first);
 TAC* setPointers(TAC* end);
+void generateCode(TAC *tBegin,FILE *output, char* fileName);
+TAC* tac_generateTempfromHash();
 #endif

@@ -10,6 +10,7 @@ typedef struct hash_node {
     int token_type;             //token or symbol type
     struct hash_node *next;
 	struct ast_node* decl;
+    HASH_NODE *strlabel;
 } HASH_NODE;
 
 HASH_NODE *table[HASH_SIZE];
@@ -20,5 +21,6 @@ void hash_print(void);
 HASH_NODE* hash_search_type(int token_type_wanted);
 HASH_NODE* makeTemp(void);
 HASH_NODE* makeLabel(void);
+
 
 #endif

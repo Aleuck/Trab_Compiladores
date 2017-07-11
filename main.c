@@ -1,13 +1,13 @@
 #include "hash.h"
 #include "lex.yy.h"
 #include <stdio.h>
-#include "ast.h"
+#include "tac.h"
 
 extern int yyparse();
 extern int isRunning(void);
-extern AST *ast_root;
+extern TAC *tBegin;
 
-void uncompile(AST *ast_root,FILE *output);
+void generateCode(TAC *tBegin,FILE *output, char* fileName);
 
 int main(int argc, char *argv[]) {
     int token, result = 1;
@@ -27,8 +27,9 @@ int main(int argc, char *argv[]) {
 	while(isRunning())	//not sure about this line
 		yyparse();
 
-    fprintf(stderr, "Gerando Programa descompilado\n");
-    uncompile(ast_root, output);
+    fprintf(stderr, "Gerando arquivo de saída\n");
+    generateCode(tBegin, output, argv[2]);
+    hash_print();
     fprintf(stderr, "Sucesssooo!! Parabenses\n");
 
 

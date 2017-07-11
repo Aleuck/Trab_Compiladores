@@ -143,10 +143,10 @@ HASH_NODE* hash_search_type(int token_type_wanted){
 }
 
 HASH_NODE* makeTemp(void){
-    static int serialNumber = 0;
+    static int Temp_serialNumber = 0;
     static char buffer[128];
 
-    sprintf(buffer, ".73mp0r4ry%d", serialNumber++);
+    sprintf(buffer, ".73mp0r4ry%d", Temp_serialNumber++);
     return hash_insert(TEMP_TYPE, buffer);
 }
 
