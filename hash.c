@@ -41,6 +41,7 @@ HASH_NODE* hash_insert(int token_type, char *text) {
     base = table[code];
 
     new = (HASH_NODE*) calloc(1, sizeof(HASH_NODE));
+    new->strlabel = NULL;
     new->text = (char*) calloc(textlen, sizeof(char));
     strcpy(new->text, text);
     new->token_type = token_type;
@@ -48,6 +49,7 @@ HASH_NODE* hash_insert(int token_type, char *text) {
     new->next = base;
     base = new;
     table[code] = base;
+    
 
     return table[code];
 }

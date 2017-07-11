@@ -45,6 +45,7 @@
 #define TAC_IDtoSTRING  39
 #define TAC_TEMP        40
 #define TAC_STR_DECL    41
+#define TAC_INC         42
 
 
 typedef struct tac_struct {
