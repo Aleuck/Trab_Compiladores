@@ -532,7 +532,7 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
                                  if(temp->op2->token_type == LIT_INTEGER){  //se o índice for literal
                                     fprintf(output, "movq %d+%s(%%rip), %%rax", 8*atoi(temp->op2->text), temp->op1->text);
                                  }else{
-                                    fprintf(output, "movq %s(%%rip),rcx\n\tleaq 0(,%%rcx,8), %%rax\n\tleaq %s(%%rip), %%rcx\n\tmovq (%%rax, %%rcx), %%rax",temp->op2->text, temp->op1->text);
+                                    fprintf(output, "movq %s(%%rip),%%rcx\n\tleaq 0(,%%rcx,8), %%rax\n\tleaq %s(%%rip), %%rcx\n\tmovq (%%rax, %%rcx), %%rax",temp->op2->text, temp->op1->text);
                                  }
                                  fprintf(output, "\n\tmovq %%rax, %s(%%rip)\n", temp->res->text);
                                  break;
@@ -542,7 +542,7 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
         case TAC_STRING        : fprintf(output, "## TAC_STRING\n\tleaq %s(%%rip), %%rcx\n\tcall printf\n", temp->op1->text); break;
         case TAC_INITIAL_VALUE : fprintf(output, "## TAC_INITIAL_VALUE\n\t.quad\t");
                                  if(strlen(temp->res->text) == 1 && (temp->res->text[0]<48 || temp->res->text[0]>57)){
-                                     fprintf(output, "%d\n", temp->res->text);
+                                     fprintf(output, "%d\n", *temp->res->text);
                                  }else{
                                      fprintf(output, "%s\n", temp->res->text);
                                  }
