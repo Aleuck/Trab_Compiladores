@@ -28,7 +28,7 @@ TAC* tac_generateTempfromHash(){
         Temp_Taclist = tac_join(Temp_Taclist, tac_create(TAC_STR_DECL, NULL, current, current->strlabel));
         current = hash_search_type(LIT_STRING);
     }
-    
+
     return Temp_Taclist;
 }
 
@@ -106,6 +106,7 @@ TAC* tac_generate(AST* node){
         case AST_WHENTHENELSE   : result = makeWhenThenElse(code[0], code[1], code[2]);break;
         case AST_WHILE          : result = makeWhile(code[0], code[1]); break;
         case AST_FOR            : result = makeFor(node->symbol, code[0], code[1], code[2]);break;
+        case AST_INC            : result = tac_join(tac_join(code[0], tac_create(TAC_INC, node->symbol, NULL, NULL)), code[1]);break;
 
         default: fprintf(stderr, "tacgenerate bugada\n");
     }
@@ -166,10 +167,10 @@ void tac_printnode(TAC* node){
 
     if(!node)
         return ;
-        
+
     if(node->type == TAC_SYMBOL)
         return ;
-    
+
     fprintf(stderr, "TAC(");
 
     switch(node->type){
@@ -216,7 +217,7 @@ void tac_printnode(TAC* node){
         case TAC_STR_DECL      : fprintf(stderr, "TAC_STR_DECL"); break;
         case TAC_INC           : fprintf(stderr, "TAC_INC"); break;
         default: fprintf(stderr, "TAC_UNKNOWN");
-        
+
     }
     fprintf(stderr, ", ");
 
@@ -333,7 +334,7 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
 
     fprintf(output, "\t.file\t\"%s\"\n", fileName);
     fprintf(output, "\t.data\n\t.globl .porcentode\n.porcentode:\n\t.ascii \"%%d\\0\"\n");
-    
+
     for(temp = tBegin; temp; temp = temp->next){
         tac_counter++;
         if(!temp){
@@ -347,7 +348,7 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
         case TAC_ENDFUNCT      : fprintf(output, "## TAC_ENDFUNCT\n\tret\n"); break;
         case TAC_FUNC_CALL     : fprintf(output, "## TAC_FUNC_CALL\n"); break;
         case TAC_ARG           : fprintf(output, "## TAC_ARG\n"); break;
-        case TAC_MOV           : fprintf(output, "## TAC_MOV\n\t"); 
+        case TAC_MOV           : fprintf(output, "## TAC_MOV\n\t");
                                  if(temp->op1->token_type == LIT_INTEGER){
                                     fprintf(output,"movq $%s, %s(%%rip)\n", temp->op1->text, temp->res->text);
                                  }else{
@@ -360,7 +361,7 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
                                  if(temp->op1->token_type == LIT_INTEGER){
                                     fprintf(output, "movq $%s, %%rax\n\t", temp->op1->text);
                                  }else{
-                                    fprintf(output, "movq %s(%%rip), %%rax\n\t", temp->op1->text); 
+                                    fprintf(output, "movq %s(%%rip), %%rax\n\t", temp->op1->text);
                                  }
                                  if(temp->op2->token_type == LIT_INTEGER){
                                      fprintf(output, "addq $%s, %%rax\n\t", temp->op2->text);
@@ -374,7 +375,7 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
                                  if(temp->op1->token_type == LIT_INTEGER){
                                     fprintf(output, "movq $%s, %%rdx\n\t", temp->op1->text);
                                  }else{
-                                    fprintf(output, "movq %s(%%rip), %%rdx\n\t", temp->op1->text); 
+                                    fprintf(output, "movq %s(%%rip), %%rdx\n\t", temp->op1->text);
                                  }
                                  if(temp->op2->token_type == LIT_INTEGER){
                                      fprintf(output, "subq $%s, %%rdx\n\t", temp->op2->text);
@@ -388,7 +389,7 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
                                  if(temp->op1->token_type == LIT_INTEGER){
                                     fprintf(output, "movq $%s, %%rax\n\t", temp->op1->text);
                                  }else{
-                                    fprintf(output, "movq %s(%%rip), %%rax\n\t", temp->op1->text); 
+                                    fprintf(output, "movq %s(%%rip), %%rax\n\t", temp->op1->text);
                                  }
                                  if(temp->op2->token_type == LIT_INTEGER){
                                      fprintf(output, "imulq $%s, %%rax, %%rax\n\t", temp->op2->text);
@@ -402,7 +403,7 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
                                  if(temp->op1->token_type == LIT_INTEGER){
                                     fprintf(output, "movq $%s, %%rax\n\t", temp->op1->text);
                                  }else{
-                                    fprintf(output, "movq %s(%%rip), %%rax\n\t", temp->op1->text); 
+                                    fprintf(output, "movq %s(%%rip), %%rax\n\t", temp->op1->text);
                                  }
                                  if(temp->op2->token_type == LIT_INTEGER){
                                      fprintf(output, "movq $%s, %%rcx\n\t", temp->op2->text);
@@ -412,7 +413,7 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
                                  fprintf(output, "cqto\n\tidivq %%rcx\n\t");
                                  fprintf(output, "movq %%rax, %s(%%rip)\n", temp->res->text);
                                  break;
-        case TAC_GT            : fprintf(output, "## TAC_GT\n\t"); 
+        case TAC_GT            : fprintf(output, "## TAC_GT\n\t");
                                  if(temp->op1->token_type == LIT_INTEGER){
                                      fprintf(output, "movq $%s, %%rax\n\t",temp->op1->text);
                                  }else{
@@ -427,7 +428,7 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
                                  fprintf(output, "setg %%al\n\tmovzbl %%al, %%eax\n\t");
                                  fprintf(output, "movq %%rax,%s(%%rip)\n", temp->res->text);
                                  break;
-        case TAC_LT            : fprintf(output, "## TAC_LT\n\t"); 
+        case TAC_LT            : fprintf(output, "## TAC_LT\n\t");
                                  if(temp->op1->token_type == LIT_INTEGER){
                                      fprintf(output, "movq $%s, %%rax\n\t",temp->op1->text);
                                  }else{
@@ -442,7 +443,7 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
                                  fprintf(output, "setl %%al\n\tmovzbl %%al, %%eax\n\t");
                                  fprintf(output, "movq %%rax,%s(%%rip)\n", temp->res->text);
                                  break;
-        case TAC_LE            : fprintf(output, "## TAC_LE\n\t"); 
+        case TAC_LE            : fprintf(output, "## TAC_LE\n\t");
                                  if(temp->op1->token_type == LIT_INTEGER){
                                      fprintf(output, "movq $%s, %%rax\n\t",temp->op1->text);
                                  }else{
@@ -457,7 +458,7 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
                                  fprintf(output, "setle %%al\n\tmovzbl %%al, %%eax\n\t");
                                  fprintf(output, "movq %%rax,%s(%%rip)\n", temp->res->text);
                                  break;
-        case TAC_GE            : fprintf(output, "## TAC_GE\n\t"); 
+        case TAC_GE            : fprintf(output, "## TAC_GE\n\t");
                                  if(temp->op1->token_type == LIT_INTEGER){
                                      fprintf(output, "movq $%s, %%rax\n\t",temp->op1->text);
                                  }else{
@@ -472,7 +473,7 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
                                  fprintf(output, "setge %%al\n\tmovzbl %%al, %%eax\n\t");
                                  fprintf(output, "movq %%rax,%s(%%rip)\n", temp->res->text);
                                  break;
-        case TAC_EQ            : fprintf(output, "## TAC_EQ\n\t"); 
+        case TAC_EQ            : fprintf(output, "## TAC_EQ\n\t");
                                  if(temp->op1->token_type == LIT_INTEGER){
                                      fprintf(output, "movq $%s, %%rax\n\t",temp->op1->text);
                                  }else{
@@ -487,7 +488,7 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
                                  fprintf(output, "sete %%al\n\tmovzbl %%al, %%eax\n\t");
                                  fprintf(output, "movq %%rax,%s(%%rip)\n", temp->res->text);
                                  break;
-        case TAC_NE            : fprintf(output, "## TAC_NE\n\t"); 
+        case TAC_NE            : fprintf(output, "## TAC_NE\n\t");
                                  if(temp->op1->token_type == LIT_INTEGER){
                                      fprintf(output, "movq $%s, %%rax\n\t",temp->op1->text);
                                  }else{
@@ -502,10 +503,10 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
                                  fprintf(output, "setne %%al\n\tmovzbl %%al, %%eax\n\t");
                                  fprintf(output, "movq %%rax,%s(%%rip)\n", temp->res->text);
                                  break;
-        case TAC_AND           : fprintf(output, "## TAC_AND\n\tmovq %s(%%rip),%%rax\n\tmovq %s(%%rip),%%rbx\n\t", temp->op1->text, temp->op2->text); 
+        case TAC_AND           : fprintf(output, "## TAC_AND\n\tmovq %s(%%rip),%%rax\n\tmovq %s(%%rip),%%rbx\n\t", temp->op1->text, temp->op2->text);
                                  fprintf(output, "andq %%rbx, %%rax\n\tmovq %%rax, %s(%%rip)\n", temp->res->text);
                                  break;
-        case TAC_OR            : fprintf(output, "## TAC_OR\n\tmovq %s(%%rip),%%rax\n\tmovq %s(%%rip),%%rbx\n\t", temp->op1->text, temp->op2->text); 
+        case TAC_OR            : fprintf(output, "## TAC_OR\n\tmovq %s(%%rip),%%rax\n\tmovq %s(%%rip),%%rbx\n\t", temp->op1->text, temp->op2->text);
                                  fprintf(output, "orq %%rbx, %%rax\n\tmovq %%rax, %s(%%rip)\n", temp->res->text);
                                  break;
         case TAC_NOT           : fprintf(output, "## TAC_NOT\n\tmovq %s(%%rip), %%rax\n\tnotq %%rax\n\tmovq %%rax, %s(%%rip)\n", temp->op1->text, temp->res->text); break;
@@ -516,7 +517,7 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
                                     fprintf(output, "movq %s(%%rip), %%rax",temp->op1->text);
                                  }
                                  fprintf(output, "\n\tnegq %%rax\n\tmovq %%rax, %s(%%rip)\n", temp->res->text); break;
-        case TAC_MOVINDEX      : fprintf(output, "## TAC_MOVINDEX\n\t"); 
+        case TAC_MOVINDEX      : fprintf(output, "## TAC_MOVINDEX\n\t");
                                  if(temp->op2->token_type == LIT_INTEGER){
                                      fprintf(output, "movq $%s, %%rdx\n\t", temp->op2->text);
                                  }else{
@@ -553,7 +554,7 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
                                      }
                                  }
                                  break;
-        case TAC_VAR_DECL      : fprintf(output, "## TAC_VAR_DECL\n\t.globl\t%s\n\t.data\n\t.align\t8\n%s:\n", temp->res->text, temp->res->text); 
+        case TAC_VAR_DECL      : fprintf(output, "## TAC_VAR_DECL\n\t.globl\t%s\n\t.data\n\t.align\t8\n%s:\n", temp->res->text, temp->res->text);
                                  initialvaluecounter = 1; break;
         case TAC_VEC_DECL      : fprintf(output, "## TAC_VEC_DECL\n\t.globl\t%s\n\t.data\n\t.align\t32\n%s:\n", temp->res->text, temp->res->text);
                                  if(temp->next && temp->next->type != TAC_INITIAL_VALUE)
@@ -563,10 +564,10 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
                                      initialvaluecounter = atoi(temp->op2->text);
                                  }
                                  break;
-       
+
         case TAC_LABEL         : fprintf(output, "## TAC_LABEL\n%s:\n", temp->res->text); break;
         case TAC_JMP           : fprintf(output, "## TAC_JMP\n\tjmp %s\n", temp->res->text); break;
-        case TAC_IFZ           : fprintf(output, "## TAC_IFZ\n\tmovq %s(%%rip), %%rax\n\t", temp->op1->text); 
+        case TAC_IFZ           : fprintf(output, "## TAC_IFZ\n\tmovq %s(%%rip), %%rax\n\t", temp->op1->text);
                                  fprintf(output, "testq %%rax, %%rax\n\tjz %s\n\t", temp->res->text);
                                  break;
         case TAC_IFLESS        : fprintf(output, "## TAC_IFLESS\n\t");
@@ -579,7 +580,7 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
                                      fprintf(output, "movq $%s,%%rbx\n\t", temp->op2->text);
                                  }else{
                                      fprintf(output, "movq %s(%%rip), %%rbx\n\t", temp->op2->text);
-                                 }  
+                                 }
                                  fprintf(output, "cmpq %%rbx, %%rax\n\tjle %s\n\t", temp->res->text);
                                  break;
         case TAC_INC        :    fprintf(output, "## TAC_INC\n\tmovq %s(%%rip), %%rax\n\t", temp->res->text);

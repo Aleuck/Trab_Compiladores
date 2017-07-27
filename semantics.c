@@ -89,7 +89,7 @@ int checkUndeclared(void) //search for TK_IDENTIFIER on hash
 
     HASH_NODE *undecl_symbol;
 
-    while(undecl_symbol = hash_search_type(TK_IDENTIFIER))
+    while((undecl_symbol = hash_search_type(TK_IDENTIFIER)))
     {
         fprintf(stderr, "Semantic Error: variable, vector or function \"%s\" undefined.\n", undecl_symbol->text);
         semanticError = 1;
@@ -127,14 +127,14 @@ void assertProperUse(AST *ast_node){
                   semanticError = 1;
                 }
                 break;
-        
+
         case AST_FOR:
                 if(ast_node->symbol->token_type != SYMBOL_LOCAL_VAR && ast_node->symbol->token_type != SYMBOL_VAR)
                 {
                     fprintf(stderr, "Semantic Error - Line %d: \"%s\" not a valid symbol - for.\n", ast_node->lineNum, ast_node->symbol->text);
                     semanticError = 1;
                 }
-                
+
                 if(!checkExpValidityArit(ast_node->son[0]))
                 {
                   fprintf(stderr, "Semantic Error - Line %d: not a valid begin expression on \"%s\" for command.\n", ast_node->lineNum, ast_node->symbol->text);
@@ -146,7 +146,7 @@ void assertProperUse(AST *ast_node){
                   semanticError = 1;
                 }
                 break;
-        
+
         case AST_RETURN:
                 if(!checkExpValidityArit(ast_node->son[0]))
                 {
@@ -179,7 +179,7 @@ void assertProperUse(AST *ast_node){
                     fprintf(stderr, "Semantic Error - Line %d: \"%s\" not a valid symbol - vector assign.\n", ast_node->lineNum, ast_node->symbol->text);
                     semanticError = 1;
                 }
-                
+
                 if(!checkIntExp(ast_node->son[0]))  //index should be int
                 {
                     fprintf(stderr, "Semantic Error - Line %d: not a valid index on \"%s\" vector assign.\n", ast_node->lineNum, ast_node->symbol->text);
@@ -197,7 +197,7 @@ void assertProperUse(AST *ast_node){
 //                  semanticError = 1;
 //                }
                 break;
-                
+
         case AST_PARENTHESIS:
         case AST_LONE_MINUS:
                 ast_node->data_type = ast_node->son[0]->data_type;
@@ -209,23 +209,23 @@ void assertProperUse(AST *ast_node){
         case AST_DIV:
                 ast_node->data_type = assertExpTypeArit(ast_node->son[0]->data_type, ast_node->son[1]->data_type);
                 break;
-               
+
         case AST_GREATER :
-        case AST_LESS    : 
-        case AST_LE      :  
-        case AST_GE      :  
-        case AST_EQ      :  
+        case AST_LESS    :
+        case AST_LE      :
+        case AST_GE      :
+        case AST_EQ      :
         case AST_NE      :
                 ast_node->data_type = assertExpTypeBool1(ast_node->son[0]->data_type, ast_node->son[1]->data_type);
                 break;
-        case AST_AND     :  
-        case AST_OR      :  
+        case AST_AND     :
+        case AST_OR      :
                 ast_node->data_type = assertExpTypeBool2(ast_node->son[0]->data_type, ast_node->son[1]->data_type);
                 break;
         case AST_NOT     :
                 ast_node->data_type = assertExpTypeBool2(ast_node->son[0]->data_type, DATATYPE_bool);
                 break;
-        
+
         case AST_VECTOR:
                 if(ast_node->symbol->token_type != SYMBOL_VECTOR)
                 {
@@ -236,14 +236,14 @@ void assertProperUse(AST *ast_node){
                 {
                     ast_node->data_type = ast_node->symbol->decl->data_type;        //inherits data_type from declaration
                 }
-                
+
                 if(!checkIntExp(ast_node->son[0]))  //index should be int
                 {
                     fprintf(stderr, "Semantic Error - Line %d: not a valid index on \"%s\" vector on exp.\n", ast_node->lineNum, ast_node->symbol->text);
                     semanticError = 1;
                 }
                 break;
-                
+
         case AST_IDENTIFIER:
                 if(ast_node->symbol->token_type != SYMBOL_LOCAL_VAR && ast_node->symbol->token_type != SYMBOL_VAR)
                 {
@@ -255,7 +255,7 @@ void assertProperUse(AST *ast_node){
                     ast_node->data_type = ast_node->symbol->decl->data_type;        //inherits data_type from declaration
                 }
                 break;
-        
+
         case AST_LIT_INTEGER:
         case AST_LIT_CHAR:
                 ast_node->data_type = DATATYPE_BYTE;
@@ -274,7 +274,7 @@ void assertProperUse(AST *ast_node){
                     ast_node->data_type = ast_node->symbol->decl->data_type;        //inherits data_type from declaration
                     checkParamlist(ast_node);
                 }
-                
+
                 break;
     }
 }
@@ -283,7 +283,7 @@ int checkIntExp(AST *node){ //insures exp type is integer
     if(node)
         if (node->data_type == DATATYPE_BYTE || node->data_type == DATATYPE_SHORT || node->data_type == DATATYPE_LONG)
             return 1;
-    
+
     return 0;
 }
 
@@ -317,7 +317,7 @@ void checkParamlist(AST* ast_node){
     int paramnum=0;
     AST* temp_inst = ast_node->son[0];
     AST* temp_decl = ast_node->symbol->decl->son[1];
-    
+
     while(1){
         paramnum++;
         if(temp_inst && temp_decl){
@@ -341,7 +341,7 @@ void checkParamlist(AST* ast_node){
                 break ;
             }
         }
-        
+
     }
 }
 

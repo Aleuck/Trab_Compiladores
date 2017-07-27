@@ -2,7 +2,6 @@
 #include "lex.yy.h"
 #include <stdio.h>
 #include "tac.h"
-#include "optimize.h"
 
 extern int yyparse();
 extern int isRunning(void);
@@ -11,7 +10,7 @@ extern TAC *tBegin;
 void generateCode(TAC *tBegin,FILE *output, char* fileName);
 
 int main(int argc, char *argv[]) {
-    int token, result = 1;
+
     FILE *output, *output_opt;
     char out_name[20];
 
@@ -34,14 +33,6 @@ int main(int argc, char *argv[]) {
     hash_print();
     fclose(yyin);
     fclose(output);
-
-    fprintf(stderr, "Otimizando ...\n");
-
-    output = fopen(argv[2], "r");
-    strcpy(out_name, argv[2]);
-    strcat(out_name, "_opt");
-    output_opt = fopen(out_name, "w");
-    optimize(output, output_opt);
 
     fprintf(stderr, "Sucesssooo!! Parabenses\n");
 

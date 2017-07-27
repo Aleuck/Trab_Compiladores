@@ -48,7 +48,8 @@
 #define AST_WHENTHENELSE     45
 #define AST_WHILE            46
 #define AST_FOR              47
-#define AST_DECL_PARAMLIST   48
+#define AST_INC              48
+#define AST_DECL_PARAMLIST   49
 
 typedef struct hash_node HASH_NODE;
 
@@ -68,6 +69,7 @@ int ast_add_son(AST *father, AST *son);
 AST *ast_insert(int node_type, HASH_NODE *symbol, AST *son0, AST *son1, AST *son2, AST *son3);
 void ast_print(int level, AST *root);
 void ast_print_node(AST *node);
+AST *simplifyExp(AST* exp);
 
 
 

@@ -13,7 +13,7 @@ void yyerror(const char *s);
 extern int yylex();
 extern int getLineNumber(void);
 extern FILE *yyin;
-
+void uncompile(AST *ast_root, FILE *output);
 int yydebug=1;
 
 AST *ast_root = NULL;
@@ -91,13 +91,14 @@ initial_values1 vector_size assign whenthen whenthenelse while for simple_string
 
 program:    glob_decl_list                {ast_root = $1; //ast_print(0, ast_root);
                                             semanticVerifications(ast_root);
+                                            uncompile(ast_root, stderr);
                                             //hash_print();
                                             tEnd = tac_join(tac_generateTempfromHash(), tac_generate(ast_root));
                                             //tac_printback(tEnd);
                                             tBegin = setPointers(tEnd);
                                             fprintf(stderr, "\n\n");
                                             tac_print(tBegin);
-											
+
                                           }
             ;
 
@@ -121,12 +122,12 @@ cmd:        block                   {$$ = $1;}
             |function_call          {$$ = $1;}
             |KW_READ TK_IDENTIFIER  {$$ = ast_insert(AST_READ, $2, 0, 0, 0, 0);}
             |KW_PRINT string_concat {$$ = ast_insert(AST_PRINT, 0, $2, 0, 0, 0);}
-            |KW_RETURN exp          {$$ = ast_insert(AST_RETURN, 0, $2, 0, 0, 0);}
+            |KW_RETURN exp          {$$ = ast_insert(AST_RETURN, 0, simplifyExp($2), 0, 0, 0);}
             |                       {$$ = NULL;}
             ;
 
-assign:     TK_IDENTIFIER '=' exp           {$$ = ast_insert(AST_VAR_ASSIGN, $1, $3, 0, 0, 0);}
-            |TK_IDENTIFIER '#' exp '=' exp  {$$ = ast_insert(AST_VECTOR_ASSIGN, $1, $3, $5, 0, 0);}
+assign:     TK_IDENTIFIER '=' exp           {$$ = ast_insert(AST_VAR_ASSIGN, $1, simplifyExp($3), 0, 0, 0);}
+            |TK_IDENTIFIER '#' exp '=' exp  {$$ = ast_insert(AST_VECTOR_ASSIGN, $1, simplifyExp($3), simplifyExp($5), 0, 0);}
             ;
 
 var_decl:   TK_IDENTIFIER ':' type initial_value    {{$$ = ast_insert(AST_VAR_DECL, $1, $3, $4, 0, 0);}}
@@ -179,16 +180,47 @@ flow_ctrl:  whenthen            {$$ = $1;}
             |for                {$$ = $1;}
             ;
 
-whenthen:   KW_WHEN '(' exp ')' KW_THEN cmd         {$$ = ast_insert(AST_WHENTHEN, 0, $3, $6, 0, 0);}
+whenthen:   KW_WHEN '(' exp ')' KW_THEN cmd         {$$ = ast_insert(AST_WHENTHEN, 0, simplifyExp($3), $6, 0, 0);}
             ;
 
-whenthenelse:   KW_WHEN '(' exp ')' KW_THEN cmd KW_ELSE cmd     {$$ = ast_insert(AST_WHENTHENELSE, 0, $3, $6, $8, 0);}
+whenthenelse:   KW_WHEN '(' exp ')' KW_THEN cmd KW_ELSE cmd     {$$ = ast_insert(AST_WHENTHENELSE, 0, simplifyExp($3), $6, $8, 0);}
                 ;
 
-while:      KW_WHILE '(' exp ')' cmd        {$$ = ast_insert(AST_WHILE, 0, $3, $5, 0, 0);}
+while:      KW_WHILE '(' exp ')' cmd        {$$ = ast_insert(AST_WHILE, 0, simplifyExp($3), $5, 0, 0);}
             ;
 
-for:        KW_FOR '(' TK_IDENTIFIER '=' exp KW_TO exp ')' cmd      {$$ = ast_insert(AST_FOR, $3, $5, $7, $9, 0);}
+for:        KW_FOR '(' TK_IDENTIFIER '=' exp KW_TO exp ')' cmd {
+                AST *son0 = simplifyExp($5), *son1 = simplifyExp($7);
+                if (son0->node_type == AST_LIT_INTEGER && son1->node_type == AST_LIT_INTEGER) {
+                  int son0value = atoi(son0->symbol->text);
+                  int son1value = atoi(son1->symbol->text);
+                  AST* ast_temp = NULL;
+                  if ($9==NULL) {
+                    if (son0value < son1value) {
+                      fprintf(stderr,"\ncaiu 0\n");
+                      $$ = ast_insert(AST_VAR_ASSIGN, $3, $7, 0, 0, 0);
+                    } else {
+                      fprintf(stderr,"\ncaiu 1\n");
+                      $$ = ast_insert(AST_VAR_ASSIGN, $3, $5, 0, 0, 0);
+                    }
+                  } else if(son0value < son1value){
+                    int cont_for;
+
+                    fprintf(stderr,"\nACERTOU!\n");
+                    for(cont_for = son0value; cont_for<son1value; cont_for++){
+
+                      ast_temp = ast_insert(AST_INC, $3, $9, ast_temp, 0, 0);
+                    }
+                    $$ = ast_insert(AST_CMD, 0, ast_temp, ast_insert(AST_VAR_ASSIGN, $3, $5, 0, 0, 0), 0, 0);
+                  } else {
+                    fprintf(stderr,"\ncaiu 2\n");
+                    $$ = ast_insert(AST_VAR_ASSIGN, $3, $5, 0, 0, 0);
+                  }
+
+                } else {
+                  $$ = ast_insert(AST_FOR, $3, son0, son1, $9, 0);
+                }
+              }
             ;
 
 function_call:  TK_IDENTIFIER '(' paramlist ')'     {$$ = ast_insert(AST_FUNCTION_CALL, $1, $3, 0, 0, 0);}
@@ -198,8 +230,8 @@ paramlist:  paramlist1  {$$ = $1;}
             |           {$$ = NULL;}
             ;
 
-paramlist1: paramlist1 ',' exp    {$$ = ast_insert(AST_PARAMLIST, 0, $3, $1, 0, 0);}
-            |exp                  {$$ = ast_insert(AST_PARAMLIST, 0, $1, 0, 0, 0);}
+paramlist1: paramlist1 ',' exp    {$$ = ast_insert(AST_PARAMLIST, 0, simplifyExp($3), $1, 0, 0);}
+            |exp                  {$$ = ast_insert(AST_PARAMLIST, 0, simplifyExp($1), 0, 0, 0);}
             ;
 
 //string concat e simple string servem apenas para o comando print
@@ -208,7 +240,7 @@ string_concat: string_concat simple_string  {$2->son[0] = $1; $$ = $2;}
                ;
 
 simple_string:  LIT_STRING      {$$ = ast_insert(AST_STRINGCONCAT, $1, 0, 0, 0, 0);}
-                |exp            {$$ = ast_insert(AST_STRINGCONCAT, 0, 0, $1, 0, 0);}
+                |exp            {$$ = ast_insert(AST_STRINGCONCAT, 0, 0, simplifyExp($1), 0, 0);}
                 ;
 
 exp:        '(' exp ')'     {$$ = ast_insert(AST_PARENTHESIS, 0, $2, 0, 0, 0);}
@@ -224,7 +256,7 @@ exp:        '(' exp ')'     {$$ = ast_insert(AST_PARENTHESIS, 0, $2, 0, 0, 0);}
             |exp OPERATOR_GE exp    {$$ = ast_insert(AST_GE, 0, $3, $1, 0, 0);}
             |exp OPERATOR_LE exp    {$$ = ast_insert(AST_LE, 0, $3, $1, 0, 0);}
             |TK_IDENTIFIER          {$$ = ast_insert(AST_IDENTIFIER, $1, 0,0,0,0);}
-            |TK_IDENTIFIER '[' exp ']'  {$$ = ast_insert(AST_VECTOR, $1, $3,0,0,0);}
+            |TK_IDENTIFIER '[' exp ']'  {$$ = ast_insert(AST_VECTOR, $1, simplifyExp($3),0,0,0);}
             |LIT_INTEGER            {$$ = ast_insert(AST_LIT_INTEGER, $1, 0,0,0,0);}
             |LIT_REAL               {$$ = ast_insert(AST_LIT_REAL, $1, 0,0,0,0);}
             |LIT_CHAR               {$$ = ast_insert(AST_LIT_CHAR, $1, 0,0,0,0);}
@@ -366,17 +398,17 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
             case AST_PRINT   :   fprintf(output,"print ");
                                     uncompile(ast_root->son[0], output);
                                     break;
-            case AST_STRINGCONCAT    :   if(ast_root->son[0])
+            case AST_STRINGCONCAT    :      if(ast_root->son[0])
                                             {
                                                 uncompile(ast_root->son[0], output);
                                                 fprintf(output, " ");
                                             }
-                                            if(ast_root->symbol->token_type == LIT_STRING){
+                                            if(!ast_root->son[1]){
                                                 fprintf(output, "\"");
                                                 fputs(ast_root->symbol->text,output);
                                                 fprintf(output, "\"");
                                             }else{
-                                                fputs(ast_root->symbol->text,output);
+                                                uncompile(ast_root->son[1], output);
                                             }
 
                                             break;

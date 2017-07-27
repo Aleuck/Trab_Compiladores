@@ -1,8 +1,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "ast.h"
+#include "y.tab.h"
+#include "hash.h"
 
 int getLineNumber(void);
+
+char *my_itoa(int num) {
+  static char str[255];
+  snprintf(str, 255, "%d", num);
+  return str;
+}
 
 AST *ast_create_node(int node_type){
     AST *node_pointer;
@@ -134,4 +142,62 @@ void ast_print_node(AST *node){ //incomplete
 
         fprintf(stderr,"\n");
     }
+}
+
+AST *simplifyExp(AST* exp){
+  int i;
+  if(exp == NULL)
+    return NULL;
+
+  for(i=0; i<MAX_CHILDREN; i++){
+    exp->son[i] = simplifyExp(exp->son[i]);
+  }
+
+
+
+  switch (exp->node_type) {
+    case AST_SUM:
+      if (exp->son[0]->node_type == AST_LIT_INTEGER && exp->son[1]->node_type == AST_LIT_INTEGER) {
+        exp->node_type = AST_LIT_INTEGER;
+        exp->symbol = hash_insert(LIT_INTEGER, my_itoa(atoi(exp->son[0]->symbol->text) + atoi(exp->son[1]->symbol->text)));
+        free(exp->son[0]);
+        free(exp->son[1]);
+        exp->son[0] = NULL;
+        exp->son[1] = NULL;
+      }
+      break;
+    case AST_SUBT:
+
+      if (exp->son[0]->node_type == AST_LIT_INTEGER && exp->son[1]->node_type == AST_LIT_INTEGER) {
+      fprintf(stderr, "\n\nentrou aq 1\n\n");
+        exp->node_type = AST_LIT_INTEGER;
+        exp->symbol = hash_insert(LIT_INTEGER, my_itoa(atoi(exp->son[1]->symbol->text) - atoi(exp->son[0]->symbol->text)));
+        free(exp->son[0]);
+        free(exp->son[1]);
+        exp->son[0] = NULL;
+        exp->son[1] = NULL;
+      }
+      break;
+    case AST_MULT:
+      if (exp->son[0]->node_type == AST_LIT_INTEGER && exp->son[1]->node_type == AST_LIT_INTEGER) {
+        exp->node_type = AST_LIT_INTEGER;
+        exp->symbol = hash_insert(LIT_INTEGER, my_itoa(atoi(exp->son[0]->symbol->text) * atoi(exp->son[1]->symbol->text)));
+        free(exp->son[0]);
+        free(exp->son[1]);
+        exp->son[0] = NULL;
+        exp->son[1] = NULL;
+      }
+      break;
+    case AST_DIV:
+      if (exp->son[0]->node_type == AST_LIT_INTEGER && exp->son[1]->node_type == AST_LIT_INTEGER) {
+        exp->node_type = AST_LIT_INTEGER;
+        exp->symbol = hash_insert(LIT_INTEGER, my_itoa(atoi(exp->son[1]->symbol->text) / atoi(exp->son[0]->symbol->text)));
+        free(exp->son[0]);
+        free(exp->son[1]);
+        exp->son[0] = NULL;
+        exp->son[1] = NULL;
+      }
+      break;
+  }
+  return exp;
 }
