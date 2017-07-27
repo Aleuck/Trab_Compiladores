@@ -15,7 +15,7 @@ int isRunning(void);
 %%
 "/*".*                      BEGIN(COMMENTARY_BLOCK);
 <COMMENTARY_BLOCK>.*"*/"    BEGIN(INITIAL);
-<COMMENTARY_BLOCK>\n        {lineNumber++;}	
+<COMMENTARY_BLOCK>\n        {lineNumber++;}
 <COMMENTARY_BLOCK>.         {  }
 
 "//".*	    { }
@@ -48,7 +48,7 @@ int isRunning(void);
 [,;:()\[\]{}+\-*/<>=!&$#] {
     return yytext[0];
 }
-\"([^\"\n\\]|\\[\"\\nrt0])*\" {
+"\""([^\"\n\\]|\\[\"\\nrt0])*"\"" {
     char *text;
     int textlen = strlen(yytext) - 1;
     text = (char*) calloc(textlen, sizeof(char));

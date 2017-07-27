@@ -341,7 +341,6 @@ void generateCode(TAC *tBegin,FILE *output, char* fileName){
             fprintf(stderr, "N foi temp. Tac nro: %d\nAbortando.", tac_counter);
             exit(666);
         }
-        fprintf(stderr, "Tac: %d\n", tac_counter);
         switch(temp->type){
         case TAC_SYMBOL        : break;
         case TAC_BEGINFUNCT    : fprintf(output, "## TAC_BEGINFUNCT\n\t.text\n\t.globl %s\n%s:\n", temp->op1->text, temp->op1->text); break;

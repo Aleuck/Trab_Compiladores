@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "semantics.h"
 #include "ast.h"
 #include "hash.h"
-#include "semantics.h"
 #include "tac.h"
 
 void yyerror(const char *s);
@@ -15,10 +15,9 @@ extern int getLineNumber(void);
 extern FILE *yyin;
 void uncompile(AST *ast_root, FILE *output);
 int yydebug=1;
-
+int hasSyntaticError = 0;
+int panicFlag = 0;
 AST *ast_root = NULL;
-TAC* tEnd = NULL;
-TAC* tBegin = NULL;
 
 %}
 
@@ -91,19 +90,15 @@ initial_values1 vector_size assign whenthen whenthenelse while for simple_string
 
 program:    glob_decl_list                {ast_root = $1; //ast_print(0, ast_root);
                                             semanticVerifications(ast_root);
+                                            fprintf(stderr, "\n\nUncompile:\n");
                                             uncompile(ast_root, stderr);
-                                            //hash_print();
-                                            tEnd = tac_join(tac_generateTempfromHash(), tac_generate(ast_root));
-                                            //tac_printback(tEnd);
-                                            tBegin = setPointers(tEnd);
-                                            fprintf(stderr, "\n\n");
-                                            tac_print(tBegin);
-
                                           }
             ;
 
 glob_decl_list: glob_decl_list glob_decl ';' {$$ = ast_insert(AST_GLOB_DECL, 0, $2, $1, 0, 0);}
+            |glob_decl_list panic            {$$ = $1;}
             |glob_decl ';'                   {$$ = $1;}
+            |panic {$$ = 0;}
             ;
 
 glob_decl:  function_decl           {$$ = $1;}
@@ -112,8 +107,11 @@ glob_decl:  function_decl           {$$ = $1;}
             ;
 
 cmd_list:   cmd_list ';' cmd        {$$ = ast_insert(AST_CMD, 0, $3, $1, 0, 0);}
+            |cmd_list panic cmd         {$$ = ast_insert(AST_CMD, 0, $3, $1, 0, 0);}
             |cmd                    {$$ = $1;}
+            |                       {$$ = NULL;}
             ;
+
 
 cmd:        block                   {$$ = $1;}
             |function_decl          {$$ = $1;}
@@ -197,23 +195,19 @@ for:        KW_FOR '(' TK_IDENTIFIER '=' exp KW_TO exp ')' cmd {
                   AST* ast_temp = NULL;
                   if ($9==NULL) {
                     if (son0value < son1value) {
-                      fprintf(stderr,"\ncaiu 0\n");
                       $$ = ast_insert(AST_VAR_ASSIGN, $3, $7, 0, 0, 0);
                     } else {
-                      fprintf(stderr,"\ncaiu 1\n");
                       $$ = ast_insert(AST_VAR_ASSIGN, $3, $5, 0, 0, 0);
                     }
                   } else if(son0value < son1value){
                     int cont_for;
 
-                    fprintf(stderr,"\nACERTOU!\n");
                     for(cont_for = son0value; cont_for<son1value; cont_for++){
 
                       ast_temp = ast_insert(AST_INC, $3, $9, ast_temp, 0, 0);
                     }
                     $$ = ast_insert(AST_CMD, 0, ast_temp, ast_insert(AST_VAR_ASSIGN, $3, $5, 0, 0, 0), 0, 0);
                   } else {
-                    fprintf(stderr,"\ncaiu 2\n");
                     $$ = ast_insert(AST_VAR_ASSIGN, $3, $5, 0, 0, 0);
                   }
 
@@ -266,12 +260,15 @@ exp:        '(' exp ')'     {$$ = ast_insert(AST_PARENTHESIS, 0, $2, 0, 0, 0);}
             |'-' exp %prec LONE_MINUS     {$$ = ast_insert(AST_LONE_MINUS, 0, $2, 0, 0, 0);}
             ;
 
+panic:  error ';'  { yyerrok; hasSyntaticError = 1; } ;
+
 %%
 
 void yyerror(const char *s) {
     printf("Parse error. \nLine Number: %d - %s\n", getLineNumber(), s);
+    hasSyntaticError = 1;
 
-    exit(3);
+    //exit(3);
 }
 
 void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprintf pra cada caso
@@ -484,6 +481,11 @@ void uncompile(AST *ast_root, FILE *output){    //switch case gigante com fprint
                                             uncompile(ast_root->son[1], output);
                                             fprintf(output,") ");
                                             uncompile(ast_root->son[2], output);
+                                            break;
+            case AST_INC            :     uncompile(ast_root->son[0], output);
+                                          fprintf(output,";\n%s += 1;\n",ast_root->symbol->text);
+
+                                            uncompile(ast_root->son[1], output);
                                             break;
             case AST_DECL_PARAMLIST  :
                                             if(ast_root->son[1])                //if not the end of recursion (there are more params)

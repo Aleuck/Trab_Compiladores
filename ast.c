@@ -169,7 +169,6 @@ AST *simplifyExp(AST* exp){
     case AST_SUBT:
 
       if (exp->son[0]->node_type == AST_LIT_INTEGER && exp->son[1]->node_type == AST_LIT_INTEGER) {
-      fprintf(stderr, "\n\nentrou aq 1\n\n");
         exp->node_type = AST_LIT_INTEGER;
         exp->symbol = hash_insert(LIT_INTEGER, my_itoa(atoi(exp->son[1]->symbol->text) - atoi(exp->son[0]->symbol->text)));
         free(exp->son[0]);

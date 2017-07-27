@@ -4,7 +4,6 @@
 #include "y.tab.h"
 #include "hash.h"
 
-int semanticError = 0;
 
 int astToData(int node_type);
 int compatibleDataTypes (int inst_type, int decl_type);
@@ -19,6 +18,7 @@ int checkExpValidityAssign(AST *node);
 int checkExpValidityBool(AST *node);
 int checkIntExp(AST *node);
 void checkParamlist(AST* ast_node);
+int semanticError = 0;
 
 void semanticVerifications(AST *ast_root){
 
@@ -28,9 +28,6 @@ void semanticVerifications(AST *ast_root){
     checkUndeclared();
     assertProperUse(ast_root);
 
-    if(semanticError){
-        exit(4);
-    }
 }
 
 void semanticSetDeclarations(AST *ast_node){
